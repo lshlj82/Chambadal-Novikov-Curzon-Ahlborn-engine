@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Chambadal–Novikov–Curzon–Ahlborn engine: beyond the Carnot engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<script>
+(function(){try{var t=localStorage.getItem('cnca-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','svg'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" async></script>
+<style>
+:root{
+  --bg:#F3F5F7; --panel:#FFFFFF; --ink:#1C2331; --muted:#5A6476; --rule:#D3D8DF;
+  --hot:#C0392B; --hot-soft:#F6DCD8; --cold:#2766A8; --cold-soft:#D8E6F4;
+  --engine:#F5E15A; --engine-ink:#2B2600; --work:#2E7D4F; --lost:#8A5DB0; --quant:#B4651B;
+  --serif:"Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121722; --panel:#1A2030; --ink:#E5E9F0; --muted:#9AA4B5; --rule:#2D3546;
+    --hot:#EF6F5E; --hot-soft:#3A2224; --cold:#69A6E6; --cold-soft:#1C2B40;
+    --engine:#DCC63E; --work:#5CC38A; --lost:#B48DDA; --quant:#E89A4E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121722; --panel:#1A2030; --ink:#E5E9F0; --muted:#9AA4B5; --rule:#2D3546;
+  --hot:#EF6F5E; --hot-soft:#3A2224; --cold:#69A6E6; --cold-soft:#1C2B40;
+  --engine:#DCC63E; --work:#5CC38A; --lost:#B48DDA; --quant:#E89A4E;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:1.075rem;line-height:1.62;-webkit-text-size-adjust:100%}
+main{max-width:1140px;margin:0 auto;padding:0 1.25rem 4rem}
+.prose{max-width:44rem}
+h1,h2,h3{font-family:var(--serif);line-height:1.2;font-weight:700}
+h1{font-size:clamp(1.9rem,4.4vw,3rem);margin:1.6rem 0 .4rem;letter-spacing:-.01em;max-width:24ch}
+h2{font-size:1.65rem;margin:3.4rem 0 .6rem}
+h3{font-size:1.2rem;margin:2rem 0 .3rem}
+p{margin:.7rem 0}
+a{color:var(--cold)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--cold);outline-offset:2px}
+.lede{font-size:1.2rem;color:var(--muted);max-width:40rem;margin:.2rem 0 1.4rem}
+.topbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-top:1.2rem}
+.course{font-family:var(--sans);font-size:.92rem;color:var(--muted);margin:0}
+#themeBtn{white-space:nowrap}
+.topbtns{display:flex;gap:.5rem;align-items:center;flex-shrink:0}
+.langlink{font-family:var(--sans);font-size:.88rem;border:1px solid var(--rule);border-radius:999px;padding:.38rem .9rem;color:var(--ink);text-decoration:none;background:var(--bg)}
+.langlink:hover{border-color:var(--ink)}
+.part h3{margin:.15rem 0 .3rem}
+.mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;padding:.2rem 0}
+hr{border:0;border-top:1px solid var(--rule);margin:3rem 0 0}
+
+/* Lab */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:1.5rem;background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:1.25rem}
+@media (max-width:900px){.lab{grid-template-columns:1fr}}
+.ui{font-family:var(--sans);font-size:.92rem}
+.ctl{margin:.2rem 0 .9rem}
+.ctl label{display:flex;justify-content:space-between;gap:1rem;font-weight:500}
+.ctl label output{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:400}
+input[type=range]{width:100%;accent-color:var(--ink);margin:.35rem 0 0}
+.btnrow{display:flex;gap:.5rem;flex-wrap:wrap;margin:.2rem 0 1rem}
+button{font-family:var(--sans);font-size:.88rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:999px;padding:.38rem .9rem;cursor:pointer}
+button:hover{border-color:var(--ink)}
+.status{font-family:var(--sans);font-size:.92rem;border-left:4px solid var(--engine);padding:.35rem .7rem;margin:.6rem 0 1rem;background:var(--bg);border-radius:0 8px 8px 0}
+.readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem 1rem;margin:.4rem 0 1rem}
+.readout div{border-top:1px solid var(--rule);padding-top:.35rem}
+.readout .k{color:var(--muted);font-size:.82rem;display:block}
+.readout .v{font-size:1.15rem;font-variant-numeric:tabular-nums;font-weight:500}
+.budget{margin:.4rem 0 .2rem}
+.budget .bar{display:flex;height:18px;border-radius:5px;overflow:hidden;border:1px solid var(--rule)}
+.budget .bar span{display:block;height:100%;transition:width .15s}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:.82rem;color:var(--muted);margin-top:.35rem}
+.legend .sw{display:inline-block;width:.8rem;height:.8rem;border-radius:2px;vertical-align:-1px;margin-right:.3rem}
+.plots{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media (max-width:640px){.plots{grid-template-columns:1fr}.readout{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.plotbox{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:.6rem}
+.plotbox figcaption{font-family:var(--sans);font-size:.84rem;color:var(--muted);padding:.2rem .3rem 0}
+svg text{font-family:var(--sans)}
+
+/* Derivation steps */
+.part{display:grid;grid-template-columns:3rem minmax(0,44rem);gap:0 .8rem;margin-top:2rem}
+.part .tag{font-family:var(--serif);font-size:1.6rem;font-weight:700;color:var(--muted);line-height:1.3}
+@media (max-width:560px){.part{grid-template-columns:1fr}.part .tag{font-size:1.2rem}}
+.box{border:1px solid var(--rule);background:var(--panel);border-radius:10px;padding:.2rem 1rem;margin:.9rem 0}
+.answer{border-left:4px solid var(--work)}
+.tablewrap{overflow-x:auto;margin:1rem 0;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.9rem;font-variant-numeric:tabular-nums;min-width:620px}
+th,td{padding:.55rem .75rem;text-align:right;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-weight:600;color:var(--muted);font-size:.82rem}
+tbody tr:last-child td{border-bottom:0}
+td.ca{color:var(--work);font-weight:600}
+.note{font-family:var(--sans);font-size:.86rem;color:var(--muted)}
+.widget{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:1.1rem 1.25rem;margin:1.2rem 0}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:640px){.cols2{grid-template-columns:1fr}}
+.cols2 h4{font-family:var(--sans);font-size:.92rem;margin:.2rem 0 .3rem;font-weight:600}
+.kv{font-family:var(--sans);font-size:.9rem;font-variant-numeric:tabular-nums;margin:0;display:grid;grid-template-columns:auto auto;gap:.15rem 1rem;justify-content:start}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.qd-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.2rem;align-items:start}
+@media (max-width:860px){.qd-grid{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--rule);margin-top:4rem;padding-top:1.4rem;font-family:var(--sans);font-size:.9rem;color:var(--muted)}
+footer p{max-width:48rem}
+footer ol{padding-left:1.3rem;max-width:48rem}
+footer li{margin:.35rem 0}
+@media (prefers-reduced-motion: reduce){.budget .bar span{transition:none}}
+</style>
+</head>
+<body>
+<main>
+
+<header class="topbar">
+  <p class="course">Statistical Physics 1, supplementary material: beyond the Carnot engine</p>
+  <div class="topbtns"><a class="langlink" href="ko.html" hreflang="ko" lang="ko">한국어</a><button id="themeBtn" type="button" aria-label="Switch color theme"></button></div>
+</header>
+<h1>The Chambadal–Novikov–Curzon–Ahlborn engine</h1>
+<p class="lede">A Carnot engine that has to deliver power in finite time. Drag the working temperature below and watch the trade-off between efficiency and power play out, then follow the derivation step by step.</p>
+
+<section class="lab" aria-label="Interactive endoreversible engine">
+  <div>
+    <svg id="diagram" viewBox="0 0 520 430" role="img" aria-label="Energy-flow diagram of the endoreversible engine with a temperature ladder"></svg>
+  </div>
+  <div class="ui">
+    <div class="ctl">
+      <label for="thw"><span>Working temperature on the hot side, \(T_{hw}\)</span> <output id="thwOut"></output></label>
+      <input id="thw" type="range" min="0" max="1000" step="1" value="500">
+    </div>
+    <div class="btnrow">
+      <button id="toMax">Set to maximum power</button>
+      <button id="toQS">Near quasi-static</button>
+      <button id="toSC">Near short circuit</button>
+    </div>
+    <div class="ctl">
+      <label for="th"><span>Hot reservoir, \(T_{h}\)</span> <output id="thOut"></output></label>
+      <input id="th" type="range" min="250" max="1000" step="5" value="600">
+    </div>
+    <div class="ctl">
+      <label for="tc"><span>Cold reservoir, \(T_{c}\)</span> <output id="tcOut"></output></label>
+      <input id="tc" type="range" min="-50" max="200" step="1" value="25">
+    </div>
+    <div class="status" id="status" aria-live="polite"><span data-st="max" hidden>At maximum power. The efficiency equals \(1-\sqrt{T_c/T_h}\) = <span id="stEta"></span>.</span><span data-st="qs" hidden>Close to the quasi-static (Carnot) limit: almost no entropy is produced and \(\eta\) approaches \(\eta_C\), but the heat trickles in and the power is nearly zero.</span><span data-st="sc" hidden>Close to the short-circuit limit: heat pours through the engine, but its two working temperatures are nearly equal, so almost no work comes out.</span><span data-st="mid-qs" hidden>Between maximum power and the quasi-static limit: more efficient, less power.</span><span data-st="mid-sc" hidden>Between the short circuit and maximum power: more heat flow, but much of it is wasted.</span></div>
+    <div class="readout">
+      <div><span class="k">Cold-side working temp. \(T_{cw}\)</span><span class="v" id="rTcw"></span></div>
+      <div><span class="k">Power \(P/K\)</span><span class="v" id="rP"></span></div>
+      <div><span class="k">Efficiency \(\eta\)</span><span class="v" id="rEta"></span></div>
+      <div><span class="k">Carnot \(\eta_{C}\)</span><span class="v" id="rEtaC"></span></div>
+      <div><span class="k">Curzon–Ahlborn \(\eta_{CA}\)</span><span class="v" id="rEtaCA"></span></div>
+      <div><span class="k">Entropy production \(\dot S/K\)</span><span class="v" id="rS"></span></div>
+    </div>
+    <div class="budget">
+      <span class="k" style="color:var(--muted);font-size:.82rem">Where the heat from the hot reservoir goes, per unit time</span>
+      <div class="bar" aria-hidden="true"><span id="bW" style="background:var(--work)"></span><span id="bL" style="background:var(--lost)"></span><span id="bR" style="background:var(--cold)"></span></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--work)"></i>Work \(P\)</span>
+        <span><i class="sw" style="background:var(--lost)"></i>Lost work \(T_c\dot S\)</span>
+        <span><i class="sw" style="background:var(--cold)"></i>Unavoidable rejection \((T_c/T_h)\,\dot Q_h\)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="plots">
+  <figure class="plotbox" style="margin:0">
+    <svg id="plotP" viewBox="0 0 520 320" role="img" aria-label="Power versus hot-side working temperature"></svg>
+    <figcaption>Power versus \(T_{hw}\). The open circle marks the maximum at \(\tfrac12\big(T_h + \sqrt{T_hT_c}\big)\).</figcaption>
+  </figure>
+  <figure class="plotbox" style="margin:0">
+    <svg id="plotPE" viewBox="0 0 520 320" role="img" aria-label="Power versus efficiency"></svg>
+    <figcaption>The same states plotted as power versus efficiency. Both ends have zero power: \(\eta = 0\) (short circuit) and \(\eta = \eta_C\) (quasi-static).</figcaption>
+  </figure>
+</div>
+
+<div class="prose">
+<h2>Setting up the model</h2>
+<p>A Carnot engine run quasi-statically reaches \(\eta_C = 1 - T_c/T_h\), but only because each isothermal stroke takes forever, so its power is zero. To get heat in and out at a finite rate, the working substance must be colder than the hot reservoir (\(T_{hw} < T_h\)) and hotter than the cold reservoir (\(T_{cw} > T_c\)). Following Schroeder, the heat flows obey a linear conduction law with the same conductance \(K\) on both sides and the same duration \(\Delta t\) for both isotherms:</p>
+\[ \frac{Q_h}{\Delta t} = K\,(T_h - T_{hw}), \qquad \frac{Q_c}{\Delta t} = K\,(T_{cw} - T_c). \]
+<p>Everything inside the engine is reversible; the only irreversibility lives in the two conducting walls. That is why the model is called <em>endoreversible</em>.</p>
+<p><strong>A note on the name.</strong> The result \(\eta = 1 - \sqrt{T_c/T_h}\) is widely known as the Curzon–Ahlborn efficiency after their 1975 paper, which is also the basis of Problem 4.6 in Schroeder's textbook. The same expression had appeared in 1957 in the work of Pierre Chambadal and Igor Novikov on the efficiency of nuclear power stations, so this page uses the name Chambadal–Novikov–Curzon–Ahlborn for the engine. The symbol \(\eta_{CA}\) is kept below to match the cited papers.</p>
+</div>
+
+<h2>The working cycle on a P–V diagram</h2>
+<div class="prose">
+<p>Inside the walls, the working substance runs an ordinary Carnot cycle, only between \(T_{hw}\) and \(T_{cw}\) instead of \(T_h\) and \(T_c\). The diagram shows this cycle for a monatomic ideal gas (\(\gamma = 5/3\)), in units where \(Nk = 1\) and the volume at the start of the hot stroke is \(V_1 = 1\). Pressure is written \(p\) here to keep it apart from the power \(P\).</p>
+<p>The cycle has four strokes: isothermal expansion at \(T_{hw}\) (1→2), adiabatic expansion (2→3), isothermal compression at \(T_{cw}\) (3→4), and adiabatic compression (4→1). Each isothermal stroke lasts the same fixed \(\Delta t\), so the heat absorbed is \(Q_h = K\Delta t\,(T_h - T_{hw}) = NkT_{hw}\ln(V_2/V_1)\), which sets the expansion ratio. The adiabats then fix \(V_3/V_2 = V_4/V_1 = (T_{hw}/T_{cw})^{1/(\gamma-1)}\).</p>
+</div>
+<div class="widget">
+  <div class="qd-grid">
+    <figure style="margin:0">
+      <svg id="plotPV" viewBox="0 0 560 400" role="img" aria-label="Pressure–volume diagram of the working cycle"></svg>
+    </figure>
+    <div class="ui">
+      <div class="ctl">
+        <label for="thw2"><span>Hot-side working temperature \(T_{hw}\)</span> <output id="thw2Out"></output></label>
+        <input id="thw2" type="range" min="0" max="1000" step="1" value="500">
+      </div>
+      <div class="legend" style="flex-direction:column;gap:.3rem;font-size:.86rem">
+        <span><i class="sw" style="background:var(--hot)"></i>Isothermal expansion at \(T_{hw}\), absorbing \(Q_h\)</span>
+        <span><i class="sw" style="background:var(--cold)"></i>Isothermal compression at \(T_{cw}\), rejecting \(Q_c\)</span>
+        <span><i class="sw" style="background:var(--muted)"></i>Adiabats</span>
+        <span><i class="sw" style="background:var(--work);opacity:.45"></i>Enclosed area \(W = Q_h - Q_c\)</span>
+        <span><i class="sw" style="background:transparent;border:1.5px dashed var(--muted)"></i>Reservoir isotherms at \(T_h\) and \(T_c\)</span>
+      </div>
+      <dl class="kv" style="margin-top:.9rem">
+        <dt>Expansion ratio \(V_2/V_1\)</dt><dd id="pvR"></dd>
+        <dt>Heat in \(Q_h/Nk\)</dt><dd id="pvQh"></dd>
+        <dt>Heat out \(Q_c/Nk\)</dt><dd id="pvQc"></dd>
+        <dt>Work per cycle \(W/Nk\)</dt><dd id="pvW"></dd>
+        <dt>Share of the largest loop</dt><dd id="pvRel"></dd>
+      </dl>
+      <p class="note">\(K\Delta t\) is chosen so that \(V_2/V_1 = 3\) at maximum power for the current reservoir temperatures.</p>
+    </div>
+  </div>
+</div>
+<div class="prose">
+<p>Because \(\Delta t\) is held fixed, the enclosed area is proportional to the power, \(P = W/2\Delta t\). The loop is therefore largest exactly at the maximum-power point, and it collapses in both limits. In the short-circuit limit the two isotherms merge and the loop flattens onto a single isotherm: lots of heat passes through, but no area. In the quasi-static limit \(Q_h \to 0\) at fixed \(\Delta t\), so the isotherms shrink to points and the loop collapses onto an adiabat. The textbook Carnot cycle keeps a finite area in that limit only because it takes \(\Delta t \to \infty\).</p>
+</div>
+
+<h2>Deriving the efficiency at maximum power</h2>
+
+<div class="part"><div class="tag">1</div><div>
+<h3>Entropy balance</h3>
+<p>Over one cycle the working substance returns to its initial state, so its entropy change is zero. Since it is reversible internally, the entropy it absorbs at \(T_{hw}\) must equal the entropy it rejects at \(T_{cw}\):</p>
+\[ \frac{Q_h}{T_{hw}} = \frac{Q_c}{T_{cw}}. \]
+<p>Substituting the conduction laws (the factors \(K\Delta t\) cancel):</p>
+\[ \frac{T_h - T_{hw}}{T_{hw}} = \frac{T_{cw} - T_c}{T_{cw}} \quad\Longleftrightarrow\quad \boxed{\;\frac{T_h}{T_{hw}} + \frac{T_c}{T_{cw}} = 2\;} \]
+<p>Solving for the cold-side working temperature gives the form used below,</p>
+\[ T_{cw} = \frac{T_c\,T_{hw}}{2T_{hw} - T_h}. \]
+<p>A working engine needs \(T_{cw} < T_{hw}\), which translates into \(\tfrac12(T_h + T_c) < T_{hw} \le T_h\). At the lower end \(T_{cw} = T_{hw}\) (short circuit); at the upper end \(T_{hw} = T_h\) and \(T_{cw} = T_c\) (quasi-static Carnot).</p>
+</div></div>
+
+<div class="part"><div class="tag">2</div><div>
+<h3>Power output</h3>
+<p>With negligible time for the adiabats, one cycle lasts \(2\Delta t\). By the first law \(W = Q_h - Q_c\), so</p>
+\[ P = \frac{Q_h - Q_c}{2\Delta t} = \frac{K}{2}\Big[(T_h - T_{hw}) - (T_{cw} - T_c)\Big]. \]
+<p>Eliminating \(T_{cw}\) with the second-law relation from step 1:</p>
+<div class="box answer">
+\[ P(T_{hw}) = \frac{K}{2}\left[\,T_h + T_c - T_{hw} - \frac{T_c\,T_{hw}}{2T_{hw} - T_h}\right]. \]
+</div>
+</div></div>
+
+<div class="part"><div class="tag">3</div><div>
+<h3>Maximizing the power</h3>
+<p>Hold \(T_h\) and \(T_c\) fixed and differentiate. Using \(\dfrac{d}{dT_{hw}}\dfrac{T_{hw}}{2T_{hw}-T_h} = \dfrac{-T_h}{(2T_{hw}-T_h)^2}\),</p>
+\[ \frac{dP}{dT_{hw}} = \frac{K}{2}\left[-1 + \frac{T_h T_c}{(2T_{hw} - T_h)^2}\right] = 0 \quad\Longrightarrow\quad 4T_{hw}^2 - 4T_h T_{hw} + T_h^2 - T_h T_c = 0. \]
+<p>The quadratic gives \(T_{hw} = \tfrac12\big(T_h \pm \sqrt{T_h T_c}\big)\). The minus root lies below \(\tfrac12(T_h+T_c)\) and would make \(T_{cw}\) negative, so it is unphysical. Since \(d^2P/dT_{hw}^2 = -2K T_hT_c/(2T_{hw}-T_h)^3 < 0\), the plus root is a maximum:</p>
+<div class="box answer">
+\[ T_{hw}^{*} = \tfrac12\left(T_h + \sqrt{T_h T_c}\right), \qquad T_{cw}^{*} = \frac{T_c\,T_{hw}^*}{\sqrt{T_hT_c}} = \tfrac12\left(T_c + \sqrt{T_h T_c}\right). \]
+</div>
+<p>Each working temperature sits halfway between its reservoir and the geometric mean \(\sqrt{T_hT_c}\). Plugging back in, the maximum power is</p>
+\[ P_{\max} = \frac{K}{4}\left(\sqrt{T_h} - \sqrt{T_c}\right)^2, \]
+<p>which matches Eq. (19) of Curzon and Ahlborn with \(\alpha = \beta = K\).</p>
+</div></div>
+
+<div class="part"><div class="tag">4</div><div>
+<h3>Efficiency at maximum power</h3>
+<p>The efficiency follows from the first law and the entropy balance of step 1:</p>
+\[ \eta = 1 - \frac{Q_c}{Q_h} = 1 - \frac{T_{cw}^*}{T_{hw}^*} = 1 - \frac{\sqrt{T_c}\,(\sqrt{T_c} + \sqrt{T_h})}{\sqrt{T_h}\,(\sqrt{T_h} + \sqrt{T_c})} \quad\Longrightarrow\quad \boxed{\;\eta_{CA} = 1 - \sqrt{T_c/T_h}\;} \]
+<p>For a coal-fired steam turbine, \(T_h = 600\,^\circ\mathrm{C} = 873.15\ \mathrm K\) and \(T_c = 25\,^\circ\mathrm{C} = 298.15\ \mathrm K\):</p>
+\[ \eta_{CA} = 1 - \sqrt{\tfrac{298.15}{873.15}} \approx 0.416, \qquad \eta_C = 1 - \tfrac{298.15}{873.15} \approx 0.659. \]
+<p>At maximum power the working temperatures are \(T_{hw}^* \approx 691.7\ \mathrm K\) (418.5 °C) and \(T_{cw}^* \approx 404.2\ \mathrm K\) (131.0 °C). The Curzon–Ahlborn value of about 42% is far closer to the roughly 40% achieved by real coal plants than the Carnot bound of 66%. Real plants are built and run to deliver power, not to approach the quasi-static limit.</p>
+</div></div>
+
+<div class="prose">
+<h2>Where the entropy comes from</h2>
+<p>The working substance's entropy returns to its initial value every cycle, but the reservoirs do not. The hot reservoir loses \(Q_h/T_h\), which is less than the \(Q_h/T_{hw}\) the engine absorbs, and the cold reservoir gains \(Q_c/T_c\), which is more than the \(Q_c/T_{cw}\) the engine rejects. The total entropy produced per cycle is therefore</p>
+\[ \Delta S_{\rm tot} = \frac{Q_c}{T_c} - \frac{Q_h}{T_h} > -\frac{Q_h}{T_{hw}} + \frac{Q_c}{T_{cw}} = 0. \]
+<p>Combining this with the first law gives a compact budget (the Gouy–Stodola relation), which is what the colored bar in the demo shows:</p>
+\[ W = \eta_C\,Q_h - T_c\,\Delta S_{\rm tot}. \]
+<p>Every bit of entropy generated in the walls costs \(T_c\) worth of work. The two limits of the slider make the trade-off concrete:</p>
+<p><strong>Quasi-static limit</strong> (\(T_{hw}\to T_h,\ T_{cw}\to T_c\)). The temperature gaps vanish, no entropy is produced, and \(\eta \to \eta_C\). But the conduction law forces \(\Delta t \to \infty\) to move a finite amount of heat, so the power goes to zero.</p>
+<p><strong>Short-circuit limit</strong> (\(T_{hw}\to T_{cw}\)). Heat flows as fast as possible, but the internal Carnot engine now runs between two equal temperatures, extracts no work, and simply passes heat from hot to cold, like a wire shorting a battery. Power and efficiency both vanish.</p>
+<p>The maximum-power point is the compromise between these two zeros, and its efficiency happens to depend on nothing but the reservoir temperatures.</p>
+</div>
+
+<div class="prose">
+<h2>Comparison with real power plants</h2>
+<p>Curzon and Ahlborn's Table I compared their formula with operating plants. The values below are recomputed from the listed temperatures, with Schroeder's example of a typical coal-fired turbine added at the top.</p>
+</div>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Power source</th><th>\(T_{c}\) (°C)</th><th>\(T_{h}\) (°C)</th><th>\(\eta_{C}\)</th><th>\(\eta_{CA}\)</th><th>Observed \(\eta\)</th></tr></thead>
+  <tbody id="plantRows"></tbody>
+</table>
+</div>
+<p class="note prose">Observed efficiencies are taken from Curzon and Ahlborn (1975), Table I; the 40% for a typical coal plant is the figure quoted by Schroeder. Small differences from the printed table come from rounding the Celsius-to-kelvin conversion.</p>
+
+<div class="prose">
+<h2>Do the simplifying assumptions matter?</h2>
+<p>Schroeder's footnote says that neither equal conductances nor equal stroke times are needed for the final efficiency. Curzon and Ahlborn allow different conductances \(\alpha\) (hot side) and \(\beta\) (cold side) and let the stroke times \(t_1, t_2\) float. Maximizing over both working temperatures gives</p>
+\[ T_{hw}^* = C\sqrt{T_h},\quad T_{cw}^* = C\sqrt{T_c},\quad C = \frac{\sqrt{\alpha T_h} + \sqrt{\beta T_c}}{\sqrt{\alpha} + \sqrt{\beta}},\quad \frac{t_1}{t_2} = \sqrt{\frac{\beta}{\alpha}}, \]
+<p>so \(T_{cw}^*/T_{hw}^* = \sqrt{T_c/T_h}\) again. With \(\alpha = \beta\) the optimal stroke times come out equal, which is why Schroeder's equal-\(\Delta t\) assumption costs nothing in that case. The widget below also checks what happens when you impose equal stroke times even though the conductances differ: the optimum shifts and the power drops, yet the efficiency at maximum power stays at \(\eta_{CA}\).</p>
+</div>
+<div class="widget ui">
+  <div class="ctl">
+    <label for="ratio"><span>Conductance ratio, \(\alpha/\beta = K_h/K_c\)</span> <output id="ratioOut"></output></label>
+    <input id="ratio" type="range" min="-100" max="100" step="1" value="-60">
+  </div>
+  <p class="note" style="margin-top:-.3rem">Reservoir temperatures follow the sliders in the demo at the top.</p>
+  <div class="cols2">
+    <div>
+      <h4>Stroke times free (Curzon–Ahlborn)</h4>
+      <dl class="kv" id="genFree"><dt>\(T_{hw}^*\)</dt><dd id="gfThw"></dd><dt>\(T_{cw}^*\)</dt><dd id="gfTcw"></dd><dt>\(t_1/t_2\)</dt><dd id="gfT12"></dd><dt>\(\eta\) at max. power</dt><dd id="gfEta"></dd><dt>Max. power</dt><dd>100% (reference)</dd></dl>
+    </div>
+    <div>
+      <h4>Stroke times forced equal</h4>
+      <dl class="kv" id="genEq"><dt>\(T_{hw}^*\)</dt><dd id="geThw"></dd><dt>\(T_{cw}^*\)</dt><dd id="geTcw"></dd><dt>\(t_1/t_2\)</dt><dd>1 (imposed)</dd><dt>\(\eta\) at max. power</dt><dd id="geEta"></dd><dt>Max. power</dt><dd id="geP"></dd></dl>
+    </div>
+  </div>
+</div>
+
+<div class="prose">
+<h2>Remarks: a quantum-dot heat engine</h2>
+<p>The Curzon–Ahlborn result started a long line of work on <em>efficiency at maximum power</em>. Near equilibrium (small \(\eta_C\)), Van den Broeck showed using linear irreversible thermodynamics that any "tightly coupled" engine, one whose heat flux is strictly proportional to its work-producing flux, should have \(\eta_{\rm op} \approx \tfrac12\eta_C\). The Curzon–Ahlborn engine obeys this, since \(\eta_{CA} = \tfrac12\eta_C + \tfrac18\eta_C^2 + \tfrac1{16}\eta_C^3 + \cdots\).</p>
+<p>A 2018 study by S. H. Lee (your instructor), J. Um, and H. Park asked how robust this "\(\tfrac12\)-universality" really is, using one of the simplest engines imaginable: a single quantum-dot level at energy \(E_{\rm QD}\) (measured from \(\mu_1\)) connecting a hot lead (\(T_1\)) to a cold lead (\(T_2\)) held at a higher chemical potential, \(\Delta\mu = \mu_2 - \mu_1\). Each electron that hops through carries heat \(E_{\rm QD}\) out of the hot lead and delivers work \(\Delta\mu\), so</p>
+\[ J = \tfrac12\left[\frac{1}{e^{E_{\rm QD}/T_1}+1} - \frac{1}{e^{(E_{\rm QD}-\Delta\mu)/T_2}+1}\right],\qquad \dot W = J\,\Delta\mu,\qquad \eta = \frac{\Delta\mu}{E_{\rm QD}} \]
+<p>(with \(k_B = 1\)). The engine is tightly coupled by construction. The role played by \(T_{hw}\) in the endoreversible engine is now played by two knobs: the gate voltage sets \(E_{\rm QD}\), and the source–drain voltage sets \(\Delta\mu\). Which knobs you are allowed to turn turns out to matter a great deal.</p>
+<p><strong>Both knobs free (global optimization).</strong> \(\eta_{\rm op} = \tfrac12\eta_C + \tfrac18\eta_C^2 + 0.0775\,\eta_C^3 + \cdots\), agreeing with Curzon–Ahlborn through second order and departing from the CA coefficient \(1/16\) only at third order.</p>
+<p><strong>Gate fixed, \(\Delta\mu\) tuned.</strong> The \(\tfrac12\) survives, but the second-order coefficient now depends on \(E_{\rm QD}\): \(\eta_{\rm op} = \tfrac12\eta_C + \tfrac{E_{\rm QD}}{16T_2}\tanh\!\big(\tfrac{E_{\rm QD}}{2T_2}\big)\eta_C^2 + \cdots\).</p>
+<p><strong>Bias fixed, gate tuned.</strong> Here the universality breaks: \(\eta_{\rm op} \approx \eta_C - (T_2/\Delta\mu)\,\eta_C^2\), with linear coefficient 1 rather than \(\tfrac12\). The expansion point \(E_{\rm QD}\to\infty\) is a zero-flux point that is <em>not</em> an equilibrium, so linear response does not apply there. The mechanical flux vanishes with an essential singularity instead of linearly. If the flux behaved as \(J_2 \propto (X_2 + \xi' X_t)X_2^{\,n}\), one would find \(\eta_{\rm op} = \frac{n+1}{n+2}\eta_C\); the ordinary linear case \(n=0\) gives \(\tfrac12\), and the essential singularity acts like \(n\to\infty\), giving 1. A quantum-dot experiment by Josefsson <em>et al.</em> (2018) tuning the gate voltage reported efficiencies at maximum power well above \(\eta_{CA}\), consistent with this picture.</p>
+<p>The curves below are computed live by numerically maximizing \(\dot W\) (with \(T_2 = 1\)).</p>
+</div>
+<div class="widget">
+  <div class="qd-grid">
+    <figure style="margin:0">
+      <svg id="plotQD" viewBox="0 0 560 380" role="img" aria-label="Efficiency at maximum power versus Carnot efficiency for the quantum-dot engine"></svg>
+    </figure>
+    <div class="ui">
+      <div class="ctl">
+        <label for="eqd"><span>Fixed gate level \(E_{\rm QD}/T_2\)</span> <output id="eqdOut"></output></label>
+        <input id="eqd" type="range" min="0.5" max="6" step="0.1" value="2">
+      </div>
+      <div class="ctl">
+        <label for="dmu"><span>Fixed bias \(\Delta\mu/T_2\)</span> <output id="dmuOut"></output></label>
+        <input id="dmu" type="range" min="0.2" max="4" step="0.1" value="1">
+      </div>
+      <div class="legend" style="flex-direction:column;gap:.3rem;font-size:.86rem" id="qdLegend"><span><i class="sw" style="background:var(--ink)"></i>Both knobs free (global)</span><span><i class="sw" style="background:var(--cold)"></i>Gate fixed at \(E_{\rm QD}\) = <span id="lgE"></span>, bias tuned</span><span><i class="sw" style="background:var(--quant)"></i>Bias fixed at \(\Delta\mu\) = <span id="lgMu"></span>, gate tuned</span><span><i class="sw" style="background:var(--work)"></i>Curzon–Ahlborn, \(1-\sqrt{1-\eta_C}\)</span><span><i class="sw" style="background:var(--muted)"></i>Reference lines \(\eta_C\) (dotted) and \(\eta_C/2\) (dashed)</span></div>
+      <p class="note">For small \(\eta_{C}\) the bias-fixed curve hugs \(\eta_{C}\) while the others start along \(\eta_C/2\). Near \(\eta_C = 1\) the bias-fixed optimum collapses logarithmically, so there is a crossover where global optimization wins again.</p>
+    </div>
+  </div>
+</div>
+<div class="prose">
+<p>The moral connects back to the main lecture: "efficiency at maximum power" is not a single number attached to an engine. It depends on the transport law (linear conduction gives Curzon–Ahlborn), on which parameters are optimized, and on whether the regime being expanded around is a genuine equilibrium. In the Curzon–Ahlborn engine, even forcing equal stroke times leaves \(\eta_{CA}\) intact; in the quantum dot, choosing the gate over the bias changes the answer at leading order.</p>
+</div>
+
+<footer>
+<p>This page was created by Claude Opus 5.5 (Anthropic) as supplementary material for Statistical Physics 1. The derivations and interactive figures were generated by the model and should be read alongside the sources below. Source code: <a href="https://github.com/lshlj82/Chambadal-Novikov-Curzon-Ahlborn-engine">Chambadal-Novikov-Curzon-Ahlborn</a> on GitHub.</p>
+<ol>
+  <li>P. Chambadal, <em>Les centrales nucléaires</em> (Armand Colin, Paris, 1957), pp. 41–58.</li>
+  <li>I. I. Novikov, “Efficiency of atomic energy installation,” <em>Atomnaya Energiya</em> <strong>3</strong>(11), 409–412 (1957).</li>
+  <li>I. I. Novikov, “The efficiency of atomic power stations (a review),” <em>Journal of Nuclear Energy</em> <strong>7</strong>(1–2), 125–128 (1958). <a href="https://doi.org/10.1016/0891-3919(58)90244-4">doi:10.1016/0891-3919(58)90244-4</a></li>
+  <li>D. V. Schroeder, <em>An Introduction to Thermal Physics</em> (Addison-Wesley, 2000), Problem 4.6.</li>
+  <li>F. L. Curzon and B. Ahlborn, “Efficiency of a Carnot engine at maximum power output,” <em>American Journal of Physics</em> <strong>43</strong>, 22–24 (1975). The textbook footnote lists volume 41; the article itself appears in volume 43.</li>
+  <li>S. H. Lee, J. Um, and H. Park, “Nonuniversality of heat-engine efficiency at maximum power,” <em>Physical Review E</em> <strong>98</strong>, 052137 (2018). <a href="https://doi.org/10.1103/PhysRevE.98.052137">doi:10.1103/PhysRevE.98.052137</a></li>
+  <li>C. Van den Broeck, “Thermodynamic efficiency at maximum power,” <em>Physical Review Letters</em> <strong>95</strong>, 190602 (2005), and M. Josefsson <em>et al.</em>, <em>Nature Nanotechnology</em> <strong>13</strong>, 920 (2018), as cited in Ref. 6.</li>
+</ol>
+</footer>
+</main>
+
+<script>
+(function(){
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const toK = c => c + 273.15;
+const pct = x => (100*x).toFixed(1) + '%';
+const f1 = x => x.toFixed(1);
+
+function el(tag, attrs, parent, text){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function niceTicks(a, b, n){
+  const span = b - a; if (span <= 0) return [a];
+  const raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1,2,2.5,5,10].map(m=>m*mag).find(s => s >= raw) || 10*mag;
+  const out = []; for (let t = Math.ceil(a/step)*step; t <= b + 1e-9*step; t += step) out.push(+t.toFixed(10));
+  return out;
+}
+// Generic line plot into an SVG with viewBox W x H
+function plot(svg, o){
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+  const m = {l:58, r:16, t:16, b:46};
+  const X = x => m.l + (x - o.xmin)/(o.xmax - o.xmin)*(W - m.l - m.r);
+  const Y = y => H - m.b - (y - o.ymin)/(o.ymax - o.ymin)*(H - m.t - m.b);
+  const g = el('g', {}, svg);
+  niceTicks(o.xmin, o.xmax, o.xticks || 5).forEach(t=>{
+    el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,style:'stroke:var(--rule);stroke-width:1'},g);
+    el('text',{x:X(t),y:H-m.b+16,'text-anchor':'middle','font-size':12,style:'fill:var(--muted)'},g,(o.xfmt||String)(t));
+  });
+  niceTicks(o.ymin, o.ymax, o.yticks || 5).forEach(t=>{
+    el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),style:'stroke:var(--rule);stroke-width:1'},g);
+    el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end','font-size':12,style:'fill:var(--muted)'},g,(o.yfmt||String)(t));
+  });
+  const lab = (t, str) => str.split(/(_\{[^}]*\})/).forEach(part=>{
+    if (part.startsWith('_{')) el('tspan',{'baseline-shift':'sub','font-size':10},t,part.slice(2,-1));
+    else if (part) el('tspan',{},t,part);
+  });
+  lab(el('text',{x:(m.l+W-m.r)/2,y:H-8,'text-anchor':'middle','font-size':13,style:'fill:var(--ink)'},g), o.xlabel);
+  lab(el('text',{x:14,y:(m.t+H-m.b)/2,'text-anchor':'middle','font-size':13,transform:`rotate(-90 14 ${(m.t+H-m.b)/2})`,style:'fill:var(--ink)'},g), o.ylabel);
+  (o.series||[]).forEach(s=>{
+    const d = s.pts.filter(p=>isFinite(p[1])).map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(2)+','+Y(Math.max(o.ymin,Math.min(o.ymax,p[1]))).toFixed(2)).join('');
+    el('path',{d, style:`fill:none;stroke:${s.color};stroke-width:${s.width||2.4};${s.dash?'stroke-dasharray:'+s.dash:''}`},g);
+  });
+  (o.points||[]).forEach(p=>{
+    el('circle',{cx:X(p.x),cy:Y(p.y),r:p.r||6,style:p.hollow?`fill:var(--panel);stroke:${p.color};stroke-width:2.5`:`fill:${p.color};stroke:var(--panel);stroke-width:2`},g);
+  });
+  return {X, Y, g};
+}
+
+/* ---------------- Light/dark toggle ---------------- */
+const root = document.documentElement, mq = window.matchMedia('(prefers-color-scheme: dark)');
+const currentTheme = () => root.getAttribute('data-theme') || (mq.matches ? 'dark' : 'light');
+function syncThemeBtn(){
+  const t = currentTheme(), b = $('themeBtn');
+  b.textContent = t === 'dark' ? '☀ Light mode' : '☾ Dark mode';
+  b.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+}
+$('themeBtn').addEventListener('click', ()=>{
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('cnca-theme', next); } catch(e) {}
+  syncThemeBtn();
+});
+if (mq.addEventListener) mq.addEventListener('change', syncThemeBtn);
+syncThemeBtn();
+
+/* ---------------- Endoreversible engine lab ---------------- */
+const S = { Th:600, Tc:25, s:0.5 };
+function geom(){
+  const Th = toK(S.Th), Tc = toK(S.Tc), lo = (Th + Tc)/2;
+  const Tstar = 0.5*(Th + Math.sqrt(Th*Tc));
+  return {Th, Tc, lo, Tstar, sStar:(Tstar - lo)/(Th - lo)};
+}
+function engineAt(Th, Tc, Thw){
+  const Tcw = Tc*Thw/(2*Thw - Th);
+  const qh = (Th - Thw)/2, qc = (Tcw - Tc)/2;           // cycle-averaged heat rates / K
+  const P = qh - qc;
+  const eta = Thw > 0 ? 1 - Tcw/Thw : 0;
+  const Sdot = qc/Tc - qh/Th;                             // entropy production rate / K
+  return {Thw, Tcw, qh, qc, P, eta, Sdot};
+}
+
+function drawDiagram(G, E){
+  const svg = $('diagram'); while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const {Th, Tc} = G;
+  // Temperature ladder
+  const top = 40, bot = 390, x0 = 64;
+  const Tmin = Tc - 0.06*(Th-Tc), Tmax = Th + 0.06*(Th-Tc);
+  const Ty = T => bot - (T - Tmin)/(Tmax - Tmin)*(bot - top);
+  const grad = el('linearGradient',{id:'tg',x1:0,y1:0,x2:0,y2:1}, el('defs',{},svg));
+  el('stop',{offset:'0%',style:'stop-color:var(--hot)'},grad); el('stop',{offset:'100%',style:'stop-color:var(--cold)'},grad);
+  el('rect',{x:x0-5,y:top,width:10,height:bot-top,rx:5,fill:'url(#tg)'},svg);
+  // engine span on ladder
+  el('rect',{x:x0-14,y:Ty(E.Thw),width:28,height:Math.max(1,Ty(E.Tcw)-Ty(E.Thw)),rx:4,style:'fill:var(--engine);opacity:.85;stroke:var(--engine-ink);stroke-width:1'},svg);
+  const marks = [[Th,'T','h','var(--hot)'],[E.Thw,'T','hw','var(--engine-ink)'],[E.Tcw,'T','cw','var(--engine-ink)'],[Tc,'T','c','var(--cold)']];
+  // label placement with minimal separation
+  let ys = marks.map(mk=>Ty(mk[0]));
+  for (let i=1;i<ys.length;i++) if (ys[i]-ys[i-1] < 15) ys[i] = ys[i-1]+15;
+  marks.forEach((mk,i)=>{
+    el('line',{x1:x0+6,x2:x0+14,y1:Ty(mk[0]),y2:Ty(mk[0]),style:'stroke:var(--ink);stroke-width:1.5'},svg);
+    const t = el('text',{x:x0+18,y:ys[i]+4,'font-size':12.5,style:'fill:var(--ink)'},svg);
+    el('tspan',{'font-style':'italic'},t,'T'); el('tspan',{'baseline-shift':'sub','font-size':9},t,mk[2]);
+    el('tspan',{dx:4},t,f1(mk[0]-273.15)+' °C');
+  });
+  // Reservoirs
+  const RX = 190, RW = 300;
+  el('rect',{x:RX,y:14,width:RW,height:48,rx:8,style:'fill:var(--hot-soft);stroke:var(--hot);stroke-width:1.5'},svg);
+  el('text',{x:RX+RW/2,y:43,'text-anchor':'middle','font-size':14,'font-weight':600,style:'fill:var(--hot)'},svg,'Hot reservoir');
+  el('rect',{x:RX,y:368,width:RW,height:48,rx:8,style:'fill:var(--cold-soft);stroke:var(--cold);stroke-width:1.5'},svg);
+  el('text',{x:RX+RW/2,y:397,'text-anchor':'middle','font-size':14,'font-weight':600,style:'fill:var(--cold)'},svg,'Cold reservoir');
+  // Engine
+  const EX = 230, EW = 200, EY = 150, EH = 120;
+  el('rect',{x:EX,y:EY,width:EW,height:EH,rx:6,style:'fill:var(--engine)'},svg);
+  el('text',{x:EX+EW/2,y:EY+30,'text-anchor':'middle','font-size':13,style:'fill:var(--engine-ink)'},svg,'Reversible Carnot engine');
+  el('text',{x:EX+EW/2,y:EY+48,'text-anchor':'middle','font-size':13,style:'fill:var(--engine-ink)'},svg,'between');
+  const tl = el('text',{x:EX+EW/2,y:EY+76,'text-anchor':'middle','font-size':15,'font-weight':600,style:'fill:var(--engine-ink)'},svg);
+  tl.textContent = f1(E.Thw-273.15)+' °C and '+f1(E.Tcw-273.15)+' °C';
+  el('text',{x:EX+EW/2,y:EY+102,'text-anchor':'middle','font-size':12,style:'fill:var(--engine-ink)'},svg,'η = '+pct(E.eta));
+  // Arrows, widths proportional to cycle-averaged flows
+  const maxQ = (Th - G.lo)/2;
+  const w = v => 3 + 40*Math.max(0,v)/maxQ;
+  const cx = EX + EW/2;
+  function vArrow(y1, y2, wd, color){
+    const h = Math.min(16, (y2-y1)*0.45), hw = Math.max(wd/2+7, 10);
+    el('polygon',{points:[[cx-wd/2,y1],[cx+wd/2,y1],[cx+wd/2,y2-h],[cx+hw,y2-h],[cx,y2],[cx-hw,y2-h],[cx-wd/2,y2-h]].map(p=>p.join(',')).join(' '),style:`fill:${color}`},svg);
+  }
+  vArrow(64, EY-2, w(E.qh), 'var(--hot)');
+  vArrow(EY+EH+2, 366, w(E.qc), 'var(--cold)');
+  const pw = w(E.P), ay = EY+EH/2, ax1 = EX+EW+2, ax2 = 512;
+  el('polygon',{points:[[ax1,ay-pw/2],[ax2-16,ay-pw/2],[ax2-16,ay-pw/2-7],[ax2,ay],[ax2-16,ay+pw/2+7],[ax2-16,ay+pw/2],[ax1,ay+pw/2]].map(p=>p.join(',')).join(' '),style:'fill:var(--work)'},svg);
+  el('text',{x:(ax1+ax2)/2-6,y:ay-pw/2-12,'text-anchor':'middle','font-size':13,'font-weight':600,style:'fill:var(--work)'},svg,'Work');
+  // flow labels
+  const flow = (x, y, sub, v, c) => { const t = el('text',{x,y,'font-size':12.5,style:'fill:'+c},svg);
+    el('tspan',{'font-style':'italic'},t,'Q̇'); el('tspan',{'baseline-shift':'sub','font-size':9},t,sub);
+    el('tspan',{},t,'/'); el('tspan',{'font-style':'italic'},t,'K'); el('tspan',{},t,' = '+f1(v)+' K'); };
+  flow(cx+w(E.qh)/2+14, 112, 'h', E.qh, 'var(--hot)');
+  flow(cx+w(E.qc)/2+14, 322, 'c', E.qc, 'var(--cold)');
+}
+
+function renderLab(){
+  const G = geom();
+  const Thw = G.lo + S.s*(G.Th - G.lo);
+  const E = engineAt(G.Th, G.Tc, Thw);
+  const etaC = 1 - G.Tc/G.Th, etaCA = 1 - Math.sqrt(G.Tc/G.Th);
+  $('thOut').textContent = S.Th + ' °C (' + f1(G.Th) + ' K)';
+  $('tcOut').textContent = S.Tc + ' °C (' + f1(G.Tc) + ' K)';
+  $('thwOut').textContent = f1(Thw-273.15) + ' °C (' + f1(Thw) + ' K)';
+  $('rTcw').textContent = f1(E.Tcw-273.15) + ' °C';
+  $('rP').textContent = E.P.toFixed(1) + ' K';
+  $('rEta').textContent = pct(E.eta);
+  $('rEtaC').textContent = pct(etaC);
+  $('rEtaCA').textContent = pct(etaCA);
+  $('rS').textContent = E.Sdot.toFixed(4);
+  // budget bar: qh = P + Tc*Sdot + (Tc/Th) qh
+  const lost = G.Tc*E.Sdot, rev = (G.Tc/G.Th)*E.qh, tot = E.qh || 1;
+  $('bW').style.width = (100*Math.max(0,E.P)/tot)+'%';
+  $('bL').style.width = (100*Math.max(0,lost)/tot)+'%';
+  $('bR').style.width = (100*Math.max(0,rev)/tot)+'%';
+  const key = Math.abs(S.s - G.sStar) < 0.004 ? 'max' : S.s > 0.96 ? 'qs' : S.s < 0.04 ? 'sc' : (S.s > G.sStar ? 'mid-qs' : 'mid-sc');
+  document.querySelectorAll('#status [data-st]').forEach(n=>{ n.hidden = n.dataset.st !== key; });
+  $('stEta').textContent = pct(etaCA);
+  drawDiagram(G, E);
+  // Plots
+  const N = 240, pts = [], pe = [];
+  for (let i=0;i<=N;i++){
+    const T = G.lo + (G.Th - G.lo)*i/N, e = engineAt(G.Th, G.Tc, T);
+    pts.push([T-273.15, e.P]); pe.push([e.eta, e.P]);
+  }
+  const Ps = engineAt(G.Th, G.Tc, G.Tstar);
+  const ymax = Ps.P*1.12;
+  plot($('plotP'), {xmin:G.lo-273.15, xmax:G.Th-273.15, ymin:0, ymax, xlabel:'Hot-side working temperature T_{hw} (°C)', ylabel:'Power P/K (K)',
+    series:[{pts, color:'var(--ink)'}],
+    points:[{x:G.Tstar-273.15, y:Ps.P, color:'var(--work)', hollow:true, r:7},{x:Thw-273.15, y:E.P, color:'var(--hot)'}]});
+  plot($('plotPE'), {xmin:0, xmax:Math.ceil(etaC*20)/20, ymin:0, ymax, xlabel:'Efficiency η', ylabel:'Power P/K (K)', xfmt:t=>Math.round(t*100)+'%',
+    series:[{pts:pe, color:'var(--ink)'},{pts:[[etaCA,0],[etaCA,ymax]], color:'var(--work)', width:1.5, dash:'5 4'},{pts:[[etaC,0],[etaC,ymax]], color:'var(--muted)', width:1.5, dash:'2 4'}],
+    points:[{x:etaCA, y:Ps.P, color:'var(--work)', hollow:true, r:7},{x:E.eta, y:E.P, color:'var(--hot)'}]});
+  $('thw').value = Math.round(S.s*1000); $('thw2').value = Math.round(S.s*1000);
+  renderPV(G, Thw); renderGeneral(); renderPlants();
+}
+function setS(s){ S.s = Math.max(0, Math.min(1, s)); $('thw').value = Math.round(S.s*1000); renderLab(); }
+$('thw').addEventListener('input', e=>{ S.s = +e.target.value/1000; renderLab(); });
+$('th').addEventListener('input', e=>{ S.Th = +e.target.value; renderLab(); });
+$('tc').addEventListener('input', e=>{ S.Tc = +e.target.value; renderLab(); });
+$('toMax').addEventListener('click', ()=>{ const G = geom(); S.s = G.sStar; $('thw').value = Math.round(G.sStar*1000); renderLab(); });
+$('toQS').addEventListener('click', ()=>setS(0.985));
+$('toSC').addEventListener('click', ()=>setS(0.02));
+
+const AXV = 'Volume V/V_{1}', AXP = 'Pressure p (Nk·K/V_{1})';
+/* ---------------- P–V diagram of the working cycle ---------------- */
+function renderPV(G, Thw){
+  const gam = 5/3, ex = 1/(gam-1), Th = G.Th, Tc = G.Tc;
+  const Tcw = Tc*Thw/(2*Thw - Th);
+  const c = Math.log(3)*G.Tstar/(Th - G.Tstar);              // K*dt/(Nk)
+  const cyc = T => { const tc = Tc*T/(2*T - Th), Qh = c*(Th - T), r = Math.exp(Qh/T), a = Math.pow(T/tc, ex);
+    return {Thw:T, Tcw:tc, Qh, Qc:Qh*tc/T, W:Qh*(1-tc/T), V1:1, V2:r, V3:r*a, V4:a}; };
+  const C = cyc(Thw), Cs = cyc(G.Tstar);
+  let Vmax = 1; for (let i=0;i<=200;i++){ const T = G.lo + (Th - G.lo)*i/200; Vmax = Math.max(Vmax, cyc(Math.min(Th, Math.max(G.lo+1e-6, T))).V3); }
+  Vmax *= 1.05;
+  const iso = (T, a, b, n=60) => Array.from({length:n+1}, (_,i)=>{ const V = a*Math.pow(b/a, i/n); return [V, T/V]; });
+  const adi = (V0, p0, a, b, n=60) => Array.from({length:n+1}, (_,i)=>{ const V = a*Math.pow(b/a, i/n); return [V, p0*Math.pow(V0/V, gam)]; });
+  const seg12 = iso(Thw, C.V1, C.V2), seg23 = adi(C.V2, Thw/C.V2, C.V2, C.V3), seg34 = iso(C.Tcw, C.V3, C.V4), seg41 = adi(C.V4, C.Tcw/C.V4, C.V4, C.V1);
+  const pmax = Th*1.08;
+  const ctx = plot($('plotPV'), {xmin:0, xmax:Vmax, ymin:0, ymax:pmax, xlabel:AXV, ylabel:AXP,
+    series:[{pts:iso(Th, Th/pmax, Vmax), color:'var(--hot)', width:1.2, dash:'5 4'},{pts:iso(Tc, Tc/pmax, Vmax), color:'var(--cold)', width:1.2, dash:'5 4'}]});
+  const {X, Y, g} = ctx;
+  const pts = [...seg12, ...seg23, ...seg34, ...seg41];
+  el('path',{d:pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(2)+','+Y(p[1]).toFixed(2)).join('')+'Z', style:'fill:var(--work);opacity:.22;stroke:none'}, g);
+  const line = (s, color, w) => el('path',{d:s.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(2)+','+Y(p[1]).toFixed(2)).join(''), style:`fill:none;stroke:${color};stroke-width:${w};stroke-linejoin:round`}, g);
+  line(seg12,'var(--hot)',3); line(seg34,'var(--cold)',3); line(seg23,'var(--muted)',2.2); line(seg41,'var(--muted)',2.2);
+  // direction arrowheads at segment midpoints
+  [[seg12,'var(--hot)'],[seg23,'var(--muted)'],[seg34,'var(--cold)'],[seg41,'var(--muted)']].forEach(([s,col])=>{
+    const m = Math.floor(s.length/2), p = s[m], q = s[m+1] || s[m];
+    const x1 = X(p[0]), y1 = Y(p[1]), x2 = X(q[0]), y2 = Y(q[1]), ang = Math.atan2(y2-y1, x2-x1);
+    if (!isFinite(ang) || Math.hypot(x2-x1,y2-y1) < 1e-6) return;
+    const L = 9, Wd = 5, c1 = Math.cos(ang), s1 = Math.sin(ang);
+    el('polygon',{points:[[x1+L*c1, y1+L*s1],[x1-Wd*s1, y1+Wd*c1],[x1+Wd*s1, y1-Wd*c1]].map(v=>v.map(z=>z.toFixed(1)).join(',')).join(' '), style:`fill:${col}`}, g);
+  });
+  [[C.V1, Thw/C.V1,'1',-14,-6],[C.V2, Thw/C.V2,'2',7,-9],[C.V3, C.Tcw/C.V3,'3',2,-11],[C.V4, C.Tcw/C.V4,'4',-15,14]].forEach(([V,p,lab,dx,dy])=>{
+    el('circle',{cx:X(V),cy:Y(p),r:4,style:'fill:var(--ink)'}, g);
+    el('text',{x:X(V)+dx,y:Y(p)+dy,'font-size':13,'font-weight':600,style:'fill:var(--ink)'}, g, lab);
+  });
+  $('thw2Out').textContent = f1(Thw-273.15) + ' °C (' + f1(Thw) + ' K)';
+  $('pvR').textContent = C.V2.toFixed(2);
+  $('pvQh').textContent = C.Qh.toFixed(1) + ' K';
+  $('pvQc').textContent = C.Qc.toFixed(1) + ' K';
+  $('pvW').textContent = C.W.toFixed(1) + ' K';
+  $('pvRel').textContent = pct(C.W/Cs.W);
+}
+$('thw2').addEventListener('input', e=>{ S.s = +e.target.value/1000; renderLab(); });
+
+/* ---------------- Power-plant table ---------------- */
+const plants = [
+  ['Typical coal-fired steam turbine (Schroeder)', 25, 600, '≈40%'],
+  ['West Thurrock (U.K.) coal-fired steam plant', 25, 565, '36%'],
+  ['CANDU (Canada) PHW nuclear reactor', 25, 300, '30%'],
+  ['Larderello (Italy) geothermal steam plant', 80, 250, '16%']
+];
+function renderPlants(){
+  const tb = $('plantRows'); if (tb.childElementCount) return;
+  plants.forEach(p=>{
+    const Tc = toK(p[1]), Th = toK(p[2]);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p[0]}</td><td>${p[0].startsWith('Typical')?'':'~'}${p[1]}</td><td>${p[2]}</td><td>${pct(1-Tc/Th)}</td><td class="ca">${pct(1-Math.sqrt(Tc/Th))}</td><td>${p[3]}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ---------------- General conductances ---------------- */
+function gmax(f, a, b, it){
+  const g = (Math.sqrt(5)-1)/2; let c = b - g*(b-a), d = a + g*(b-a), fc = f(c), fd = f(d);
+  for (let i=0;i<(it||90);i++){
+    if (fc > fd){ b = d; d = c; fd = fc; c = b - g*(b-a); fc = f(c); }
+    else { a = c; c = d; fc = fd; d = a + g*(b-a); fd = f(d); }
+  }
+  const x = (a+b)/2; return [x, f(x)];
+}
+function renderGeneral(){
+  const r = Math.pow(10, +$('ratio').value/100); // Kh/Kc, with Kc = 1
+  $('ratioOut').textContent = r.toFixed(2);
+  const Th = toK(S.Th), Tc = toK(S.Tc), Kh = r, Kc = 1;
+  // Free stroke times (Curzon–Ahlborn Eqs. 11, 12, 16, 19 with gamma = 1)
+  const C = (Math.sqrt(Kh*Th) + Math.sqrt(Kc*Tc))/(Math.sqrt(Kh)+Math.sqrt(Kc));
+  const Thw = C*Math.sqrt(Th), Tcw = C*Math.sqrt(Tc);
+  const Pfree = Kh*Kc/Math.pow(Math.sqrt(Kh)+Math.sqrt(Kc),2)*Math.pow(Math.sqrt(Th)-Math.sqrt(Tc),2);
+  const t12 = Math.sqrt(Kc/Kh);
+  // Equal stroke times: entropy balance Kh(Th-Thw)/Thw = Kc(Tcw-Tc)/Tcw
+  const Pe = T => { const A = Kh*(Th-T)/T; if (A >= Kc) return -1e12; const tcw = Tc/(1-A/Kc); return (Kh*(Th-T) - Kc*(tcw-Tc))/2; };
+  // coarse scan then golden refinement
+  let best = Tc+1e-6, bv = -Infinity; const n = 400;
+  for (let i=1;i<=n;i++){ const T = Tc + (Th-Tc)*i/n, v = Pe(T); if (v > bv){ bv = v; best = T; } }
+  const step = (Th-Tc)/n;
+  const [Te, Pq] = gmax(Pe, Math.max(Tc+1e-9, best-step), Math.min(Th, best+step));
+  const Ae = Kh*(Th-Te)/Te, Tcwe = Tc/(1-Ae/Kc);
+  $('gfThw').textContent = f1(Thw-273.15)+' °C'; $('gfTcw').textContent = f1(Tcw-273.15)+' °C';
+  $('gfT12').textContent = t12.toFixed(3); $('gfEta').textContent = pct(1-Tcw/Thw);
+  $('geThw').textContent = f1(Te-273.15)+' °C'; $('geTcw').textContent = f1(Tcwe-273.15)+' °C';
+  $('geEta').textContent = pct(1-Tcwe/Te); $('geP').textContent = (100*Pq/Pfree).toFixed(1)+'% of free case';
+}
+$('ratio').addEventListener('input', renderGeneral);
+
+/* ---------------- Quantum-dot engine ---------------- */
+const T2 = 1;
+function Wqd(E, dmu, T1){
+  const q = 1/(1+Math.exp(E/T1)), e = 1/(1+Math.exp((E-dmu)/T2));
+  return 0.5*(q-e)*dmu;
+}
+const etas = []; for (let x=0.02; x<0.951; x+=0.01) etas.push(+x.toFixed(3));
+let globalCurve = null;
+function computeGlobal(){
+  globalCurve = etas.map(ec=>{
+    const T1 = T2/(1-ec);
+    const inner = E => gmax(d=>Wqd(E,d,T1), 0, ec*E, 70);
+    const [E] = gmax(E=>inner(E)[1], 0.05, 8*T1, 70);
+    const [d] = inner(E);
+    return [ec, d/E];
+  });
+}
+function renderQD(){
+  const Eq = +$('eqd').value, dm = +$('dmu').value;
+  $('eqdOut').textContent = Eq.toFixed(1); $('dmuOut').textContent = dm.toFixed(1);
+  if (!globalCurve) computeGlobal();
+  const fixE = etas.map(ec=>{ const T1 = T2/(1-ec); const [d] = gmax(d=>Wqd(Eq,d,T1), 0, ec*Eq, 90); return [ec, d/Eq]; });
+  const fixMu = etas.map(ec=>{ const T1 = T2/(1-ec); const lo = dm/ec; const [E] = gmax(E=>Wqd(E,dm,T1), lo, lo + 60*T1, 110); return [ec, dm/E]; });
+  const ca = etas.map(ec=>[ec, 1-Math.sqrt(1-ec)]);
+  plot($('plotQD'), {xmin:0, xmax:1, ymin:0, ymax:1, xlabel:'Carnot efficiency η_{C}', ylabel:'Efficiency at maximum power η_{op}',
+    series:[
+      {pts:[[0,0],[1,1]], color:'var(--muted)', width:1.2, dash:'2 4'},
+      {pts:[[0,0],[1,0.5]], color:'var(--muted)', width:1.2, dash:'7 5'},
+      {pts:ca, color:'var(--work)', width:2},
+      {pts:globalCurve, color:'var(--ink)', width:2.6},
+      {pts:fixE, color:'var(--cold)', width:2.4},
+      {pts:fixMu, color:'var(--quant)', width:2.6}
+    ]});
+  $('lgE').textContent = Eq.toFixed(1); $('lgMu').textContent = dm.toFixed(1);
+}
+$('eqd').addEventListener('input', renderQD);
+$('dmu').addEventListener('input', renderQD);
+
+// Start at maximum power
+const G0 = geom(); S.s = G0.sStar; $('thw').value = Math.round(G0.sStar*1000);
+renderLab(); renderQD();
+})();
+</script>
+</body>
+</html>

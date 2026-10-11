@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chambadal–Novikov–Curzon–Ahlborn 엔진: 카르노 엔진 너머</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<script>
+(function(){try{var t=localStorage.getItem('cnca-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+</script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','svg'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js" async></script>
+<style>
+:root{
+  --bg:#F3F5F7; --panel:#FFFFFF; --ink:#1C2331; --muted:#5A6476; --rule:#D3D8DF;
+  --hot:#C0392B; --hot-soft:#F6DCD8; --cold:#2766A8; --cold-soft:#D8E6F4;
+  --engine:#F5E15A; --engine-ink:#2B2600; --work:#2E7D4F; --lost:#8A5DB0; --quant:#B4651B;
+  --serif:"Source Serif 4", "Source Serif Pro", "Noto Serif KR", "Apple SD Gothic Neo", Georgia, "Times New Roman", serif;
+  --sans:"IBM Plex Sans", "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121722; --panel:#1A2030; --ink:#E5E9F0; --muted:#9AA4B5; --rule:#2D3546;
+    --hot:#EF6F5E; --hot-soft:#3A2224; --cold:#69A6E6; --cold-soft:#1C2B40;
+    --engine:#DCC63E; --work:#5CC38A; --lost:#B48DDA; --quant:#E89A4E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121722; --panel:#1A2030; --ink:#E5E9F0; --muted:#9AA4B5; --rule:#2D3546;
+  --hot:#EF6F5E; --hot-soft:#3A2224; --cold:#69A6E6; --cold-soft:#1C2B40;
+  --engine:#DCC63E; --work:#5CC38A; --lost:#B48DDA; --quant:#E89A4E;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{word-break:keep-all;margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:1.075rem;line-height:1.62;-webkit-text-size-adjust:100%}
+main{max-width:1140px;margin:0 auto;padding:0 1.25rem 4rem}
+.prose{max-width:44rem}
+h1,h2,h3{font-family:var(--serif);line-height:1.2;font-weight:700}
+h1{font-size:clamp(1.9rem,4.4vw,3rem);margin:1.6rem 0 .4rem;letter-spacing:-.01em;max-width:24ch}
+h2{font-size:1.65rem;margin:3.4rem 0 .6rem}
+h3{font-size:1.2rem;margin:2rem 0 .3rem}
+p{margin:.7rem 0}
+a{color:var(--cold)}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--cold);outline-offset:2px}
+.lede{font-size:1.2rem;color:var(--muted);max-width:40rem;margin:.2rem 0 1.4rem}
+.topbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-top:1.2rem}
+.course{font-family:var(--sans);font-size:.92rem;color:var(--muted);margin:0}
+#themeBtn{white-space:nowrap}
+.topbtns{display:flex;gap:.5rem;align-items:center;flex-shrink:0}
+.langlink{font-family:var(--sans);font-size:.88rem;border:1px solid var(--rule);border-radius:999px;padding:.38rem .9rem;color:var(--ink);text-decoration:none;background:var(--bg)}
+.langlink:hover{border-color:var(--ink)}
+.part h3{margin:.15rem 0 .3rem}
+.mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;padding:.2rem 0}
+hr{border:0;border-top:1px solid var(--rule);margin:3rem 0 0}
+
+/* Lab */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:1.5rem;background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:1.25rem}
+@media (max-width:900px){.lab{grid-template-columns:1fr}}
+.ui{font-family:var(--sans);font-size:.92rem}
+.ctl{margin:.2rem 0 .9rem}
+.ctl label{display:flex;justify-content:space-between;gap:1rem;font-weight:500}
+.ctl label output{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:400}
+input[type=range]{width:100%;accent-color:var(--ink);margin:.35rem 0 0}
+.btnrow{display:flex;gap:.5rem;flex-wrap:wrap;margin:.2rem 0 1rem}
+button{font-family:var(--sans);font-size:.88rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:999px;padding:.38rem .9rem;cursor:pointer}
+button:hover{border-color:var(--ink)}
+.status{font-family:var(--sans);font-size:.92rem;border-left:4px solid var(--engine);padding:.35rem .7rem;margin:.6rem 0 1rem;background:var(--bg);border-radius:0 8px 8px 0}
+.readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem 1rem;margin:.4rem 0 1rem}
+.readout div{border-top:1px solid var(--rule);padding-top:.35rem}
+.readout .k{color:var(--muted);font-size:.82rem;display:block}
+.readout .v{font-size:1.15rem;font-variant-numeric:tabular-nums;font-weight:500}
+.budget{margin:.4rem 0 .2rem}
+.budget .bar{display:flex;height:18px;border-radius:5px;overflow:hidden;border:1px solid var(--rule)}
+.budget .bar span{display:block;height:100%;transition:width .15s}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1rem;font-size:.82rem;color:var(--muted);margin-top:.35rem}
+.legend .sw{display:inline-block;width:.8rem;height:.8rem;border-radius:2px;vertical-align:-1px;margin-right:.3rem}
+.plots{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media (max-width:640px){.plots{grid-template-columns:1fr}.readout{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.plotbox{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:.6rem}
+.plotbox figcaption{font-family:var(--sans);font-size:.84rem;color:var(--muted);padding:.2rem .3rem 0}
+svg text{font-family:var(--sans)}
+
+/* Derivation steps */
+.part{display:grid;grid-template-columns:3rem minmax(0,44rem);gap:0 .8rem;margin-top:2rem}
+.part .tag{font-family:var(--serif);font-size:1.6rem;font-weight:700;color:var(--muted);line-height:1.3}
+@media (max-width:560px){.part{grid-template-columns:1fr}.part .tag{font-size:1.2rem}}
+.box{border:1px solid var(--rule);background:var(--panel);border-radius:10px;padding:.2rem 1rem;margin:.9rem 0}
+.answer{border-left:4px solid var(--work)}
+.tablewrap{overflow-x:auto;margin:1rem 0;border:1px solid var(--rule);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:.9rem;font-variant-numeric:tabular-nums;min-width:620px}
+th,td{padding:.55rem .75rem;text-align:right;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-weight:600;color:var(--muted);font-size:.82rem}
+tbody tr:last-child td{border-bottom:0}
+td.ca{color:var(--work);font-weight:600}
+.note{font-family:var(--sans);font-size:.86rem;color:var(--muted)}
+.widget{background:var(--panel);border:1px solid var(--rule);border-radius:14px;padding:1.1rem 1.25rem;margin:1.2rem 0}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:640px){.cols2{grid-template-columns:1fr}}
+.cols2 h4{font-family:var(--sans);font-size:.92rem;margin:.2rem 0 .3rem;font-weight:600}
+.kv{font-family:var(--sans);font-size:.9rem;font-variant-numeric:tabular-nums;margin:0;display:grid;grid-template-columns:auto auto;gap:.15rem 1rem;justify-content:start}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.qd-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.2rem;align-items:start}
+@media (max-width:860px){.qd-grid{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--rule);margin-top:4rem;padding-top:1.4rem;font-family:var(--sans);font-size:.9rem;color:var(--muted)}
+footer p{max-width:48rem}
+footer ol{padding-left:1.3rem;max-width:48rem}
+footer li{margin:.35rem 0}
+@media (prefers-reduced-motion: reduce){.budget .bar span{transition:none}}
+</style>
+</head>
+<body>
+<main>
+
+<header class="topbar">
+  <p class="course">통계물리 1 보충 자료: 카르노 엔진 너머</p>
+  <div class="topbtns"><a class="langlink" href="index.html" hreflang="en" lang="en">English</a><button id="themeBtn" type="button" aria-label="색상 테마 전환"></button></div>
+</header>
+<h1>Chambadal–Novikov–Curzon–Ahlborn 엔진</h1>
+<p class="lede">유한한 시간 안에 일률을 내야 하는 카르노 엔진입니다. 아래에서 작동 온도를 움직이며 효율과 일률 사이의 절충 관계를 직접 확인한 뒤, 유도 과정을 단계별로 따라가 보세요.</p>
+
+<section class="lab" aria-label="내부가역 엔진 인터랙티브 데모">
+  <div>
+    <svg id="diagram" viewBox="0 0 520 430" role="img" aria-label="온도 사다리가 함께 그려진 내부가역 엔진의 에너지 흐름도"></svg>
+  </div>
+  <div class="ui">
+    <div class="ctl">
+      <label for="thw"><span>고온 쪽 작동 온도 \(T_{hw}\)</span> <output id="thwOut"></output></label>
+      <input id="thw" type="range" min="0" max="1000" step="1" value="500">
+    </div>
+    <div class="btnrow">
+      <button id="toMax">최대 일률로 설정</button>
+      <button id="toQS">준정적 극한 근처</button>
+      <button id="toSC">단락 극한 근처</button>
+    </div>
+    <div class="ctl">
+      <label for="th"><span>고온 열원 \(T_{h}\)</span> <output id="thOut"></output></label>
+      <input id="th" type="range" min="250" max="1000" step="5" value="600">
+    </div>
+    <div class="ctl">
+      <label for="tc"><span>저온 열원 \(T_{c}\)</span> <output id="tcOut"></output></label>
+      <input id="tc" type="range" min="-50" max="200" step="1" value="25">
+    </div>
+    <div class="status" id="status" aria-live="polite"><span data-st="max" hidden>최대 일률 상태입니다. 효율은 \(1-\sqrt{T_c/T_h}\) = <span id="stEta"></span>입니다.</span><span data-st="qs" hidden>준정적(카르노) 극한 근처입니다. 엔트로피가 거의 생성되지 않아 \(\eta\)가 \(\eta_C\)에 가까워지지만, 열이 아주 느리게 들어와 일률은 거의 0입니다.</span><span data-st="sc" hidden>단락 극한 근처입니다. 열이 엔진을 빠르게 통과하지만 두 작동 온도가 거의 같아서 일이 거의 나오지 않습니다.</span><span data-st="mid-qs" hidden>최대 일률과 준정적 극한 사이입니다. 효율은 더 높지만 일률은 더 낮습니다.</span><span data-st="mid-sc" hidden>단락 극한과 최대 일률 사이입니다. 열은 더 많이 흐르지만 상당 부분이 낭비됩니다.</span></div>
+    <div class="readout">
+      <div><span class="k">저온 쪽 작동 온도 \(T_{cw}\)</span><span class="v" id="rTcw"></span></div>
+      <div><span class="k">일률 \(P/K\)</span><span class="v" id="rP"></span></div>
+      <div><span class="k">효율 \(\eta\)</span><span class="v" id="rEta"></span></div>
+      <div><span class="k">카르노 효율 \(\eta_{C}\)</span><span class="v" id="rEtaC"></span></div>
+      <div><span class="k">Curzon–Ahlborn 효율 \(\eta_{CA}\)</span><span class="v" id="rEtaCA"></span></div>
+      <div><span class="k">엔트로피 생성률 \(\dot S/K\)</span><span class="v" id="rS"></span></div>
+    </div>
+    <div class="budget">
+      <span class="k" style="color:var(--muted);font-size:.82rem">고온 열원에서 들어온 열의 단위 시간당 행방</span>
+      <div class="bar" aria-hidden="true"><span id="bW" style="background:var(--work)"></span><span id="bL" style="background:var(--lost)"></span><span id="bR" style="background:var(--cold)"></span></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--work)"></i>일 \(P\)</span>
+        <span><i class="sw" style="background:var(--lost)"></i>잃어버린 일 \(T_c\dot S\)</span>
+        <span><i class="sw" style="background:var(--cold)"></i>피할 수 없는 방출 \((T_c/T_h)\,\dot Q_h\)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="plots">
+  <figure class="plotbox" style="margin:0">
+    <svg id="plotP" viewBox="0 0 520 320" role="img" aria-label="고온 쪽 작동 온도에 따른 일률"></svg>
+    <figcaption>\(T_{hw}\)에 따른 일률. 빈 원은 \(\tfrac12\big(T_h + \sqrt{T_hT_c}\big)\)에서의 최댓값을 나타냅니다.</figcaption>
+  </figure>
+  <figure class="plotbox" style="margin:0">
+    <svg id="plotPE" viewBox="0 0 520 320" role="img" aria-label="효율에 따른 일률"></svg>
+    <figcaption>같은 상태들을 일률–효율 평면에 그린 것입니다. 양 끝, 즉 \(\eta = 0\)(단락)과 \(\eta = \eta_C\)(준정적)에서 일률은 모두 0입니다.</figcaption>
+  </figure>
+</div>
+
+<div class="prose">
+<h2>모형 세우기</h2>
+<p>준정적으로 작동하는 카르노 엔진은 \(\eta_C = 1 - T_c/T_h\)에 도달하지만, 이는 각 등온 과정에 무한한 시간이 걸리기 때문이며 그 결과 일률은 0입니다. 유한한 속도로 열을 주고받으려면 작동 물질이 고온 열원보다 차갑고(\(T_{hw} < T_h\)) 저온 열원보다 뜨거워야(\(T_{cw} > T_c\)) 합니다. Schroeder를 따라, 열 흐름은 양쪽에서 같은 열전도 계수 \(K\)를 갖는 선형 열전도 법칙을 따르고 두 등온 과정은 같은 시간 \(\Delta t\) 동안 일어난다고 가정합니다.</p>
+\[ \frac{Q_h}{\Delta t} = K\,(T_h - T_{hw}), \qquad \frac{Q_c}{\Delta t} = K\,(T_{cw} - T_c). \]
+<p>엔진 내부는 모두 가역적이고, 비가역성은 오직 열을 전달하는 두 벽에서만 생깁니다. 그래서 이 모형을 <strong>내부가역</strong>(endoreversible) 엔진이라고 부릅니다.</p>
+<p><strong>이름에 관하여.</strong> \(\eta = 1 - \sqrt{T_c/T_h}\)라는 결과는 1975년 논문의 저자 이름을 따서 흔히 Curzon–Ahlborn 효율이라 불리며, 이 논문은 Schroeder 교과서 연습문제 4.6의 바탕이기도 합니다. 그러나 같은 식이 이미 1957년 Pierre Chambadal과 Igor Novikov의 원자력 발전소 효율 연구에 등장했으므로, 이 페이지에서는 엔진을 Chambadal–Novikov–Curzon–Ahlborn 엔진이라 부릅니다. 기호 \(\eta_{CA}\)는 인용 논문들과 맞추기 위해 그대로 사용합니다.</p>
+</div>
+
+<h2>P–V 도표로 본 실제 작동 순환</h2>
+<div class="prose">
+<p>벽 안쪽에서 작동 물질은 보통의 카르노 순환을 합니다. 다만 \(T_h\)와 \(T_c\)가 아니라 \(T_{hw}\)와 \(T_{cw}\) 사이에서 작동합니다. 아래 도표는 단원자 이상기체(\(\gamma = 5/3\))에 대해 이 순환을 그린 것으로, \(Nk = 1\)이고 고온 등온 과정이 시작될 때의 부피를 \(V_1 = 1\)로 두었습니다. 일률 \(P\)와 구별하기 위해 압력은 \(p\)로 씁니다.</p>
+<p>순환은 네 과정으로 이루어집니다. \(T_{hw}\)에서의 등온 팽창(1→2), 단열 팽창(2→3), \(T_{cw}\)에서의 등온 압축(3→4), 단열 압축(4→1)입니다. 각 등온 과정은 같은 시간 \(\Delta t\) 동안 진행되므로 흡수하는 열은 \(Q_h = K\Delta t\,(T_h - T_{hw}) = NkT_{hw}\ln(V_2/V_1)\)이고, 이것이 팽창비를 결정합니다. 단열 과정은 \(V_3/V_2 = V_4/V_1 = (T_{hw}/T_{cw})^{1/(\gamma-1)}\)을 정합니다.</p>
+</div>
+<div class="widget">
+  <div class="qd-grid">
+    <figure style="margin:0">
+      <svg id="plotPV" viewBox="0 0 560 400" role="img" aria-label="작동 순환의 압력–부피 도표"></svg>
+    </figure>
+    <div class="ui">
+      <div class="ctl">
+        <label for="thw2"><span>고온 쪽 작동 온도 \(T_{hw}\)</span> <output id="thw2Out"></output></label>
+        <input id="thw2" type="range" min="0" max="1000" step="1" value="500">
+      </div>
+      <div class="legend" style="flex-direction:column;gap:.3rem;font-size:.86rem">
+        <span><i class="sw" style="background:var(--hot)"></i>\(T_{hw}\)에서의 등온 팽창, \(Q_h\) 흡수</span>
+        <span><i class="sw" style="background:var(--cold)"></i>\(T_{cw}\)에서의 등온 압축, \(Q_c\) 방출</span>
+        <span><i class="sw" style="background:var(--muted)"></i>단열 과정</span>
+        <span><i class="sw" style="background:var(--work);opacity:.45"></i>둘러싼 넓이 \(W = Q_h - Q_c\)</span>
+        <span><i class="sw" style="background:transparent;border:1.5px dashed var(--muted)"></i>열원 온도 \(T_h\), \(T_c\)의 등온선</span>
+      </div>
+      <dl class="kv" style="margin-top:.9rem">
+        <dt>팽창비 \(V_2/V_1\)</dt><dd id="pvR"></dd>
+        <dt>흡수한 열 \(Q_h/Nk\)</dt><dd id="pvQh"></dd>
+        <dt>방출한 열 \(Q_c/Nk\)</dt><dd id="pvQc"></dd>
+        <dt>한 순환의 일 \(W/Nk\)</dt><dd id="pvW"></dd>
+        <dt>가장 큰 순환 대비</dt><dd id="pvRel"></dd>
+      </dl>
+      <p class="note">현재 열원 온도에서 최대 일률일 때 \(V_2/V_1 = 3\)이 되도록 \(K\Delta t\)를 정했습니다.</p>
+    </div>
+  </div>
+</div>
+<div class="prose">
+<p>\(\Delta t\)가 고정되어 있으므로 둘러싼 넓이는 일률에 비례합니다(\(P = W/2\Delta t\)). 따라서 순환의 넓이는 정확히 최대 일률 지점에서 가장 크고, 두 극한에서는 모두 사라집니다. 단락 극한에서는 두 등온선이 합쳐져 순환이 하나의 등온선 위로 납작해집니다. 열은 많이 지나가지만 넓이가 없습니다. 준정적 극한에서는 고정된 \(\Delta t\)에서 \(Q_h \to 0\)이므로 등온 과정이 점으로 줄어들어 순환이 단열선 위로 무너집니다. 교과서의 카르노 순환이 이 극한에서도 유한한 넓이를 갖는 것은 \(\Delta t \to \infty\)를 허용하기 때문입니다.</p>
+</div>
+
+<h2>최대 일률에서의 효율 유도</h2>
+
+<div class="part"><div class="tag">1</div><div>
+<h3>엔트로피 균형</h3>
+<p>한 순환이 끝나면 작동 물질은 처음 상태로 돌아오므로 엔트로피 변화가 0입니다. 내부가 가역적이므로 \(T_{hw}\)에서 흡수한 엔트로피는 \(T_{cw}\)에서 방출한 엔트로피와 같아야 합니다.</p>
+\[ \frac{Q_h}{T_{hw}} = \frac{Q_c}{T_{cw}}. \]
+<p>열전도 법칙을 대입하면 (\(K\Delta t\)는 약분됩니다)</p>
+\[ \frac{T_h - T_{hw}}{T_{hw}} = \frac{T_{cw} - T_c}{T_{cw}} \quad\Longleftrightarrow\quad \boxed{\;\frac{T_h}{T_{hw}} + \frac{T_c}{T_{cw}} = 2\;} \]
+<p>이를 저온 쪽 작동 온도에 대해 풀면 아래에서 쓸 형태를 얻습니다.</p>
+\[ T_{cw} = \frac{T_c\,T_{hw}}{2T_{hw} - T_h}. \]
+<p>엔진이 일을 하려면 \(T_{cw} < T_{hw}\)여야 하고, 이는 \(\tfrac12(T_h + T_c) < T_{hw} \le T_h\)에 해당합니다. 아래 끝에서는 \(T_{cw} = T_{hw}\)(단락), 위 끝에서는 \(T_{hw} = T_h\), \(T_{cw} = T_c\)(준정적 카르노)가 됩니다.</p>
+</div></div>
+
+<div class="part"><div class="tag">2</div><div>
+<h3>일률</h3>
+<p>단열 과정에 걸리는 시간을 무시하면 한 순환은 \(2\Delta t\) 동안 진행됩니다. 열역학 제1법칙에 의해 \(W = Q_h - Q_c\)이므로</p>
+\[ P = \frac{Q_h - Q_c}{2\Delta t} = \frac{K}{2}\Big[(T_h - T_{hw}) - (T_{cw} - T_c)\Big]. \]
+<p>1단계의 제2법칙 관계식으로 \(T_{cw}\)를 소거하면</p>
+<div class="box answer">
+\[ P(T_{hw}) = \frac{K}{2}\left[\,T_h + T_c - T_{hw} - \frac{T_c\,T_{hw}}{2T_{hw} - T_h}\right]. \]
+</div>
+</div></div>
+
+<div class="part"><div class="tag">3</div><div>
+<h3>일률 최대화</h3>
+<p>\(T_h\)와 \(T_c\)를 고정하고 미분합니다. \(\dfrac{d}{dT_{hw}}\dfrac{T_{hw}}{2T_{hw}-T_h} = \dfrac{-T_h}{(2T_{hw}-T_h)^2}\)를 이용하면</p>
+\[ \frac{dP}{dT_{hw}} = \frac{K}{2}\left[-1 + \frac{T_h T_c}{(2T_{hw} - T_h)^2}\right] = 0 \quad\Longrightarrow\quad 4T_{hw}^2 - 4T_h T_{hw} + T_h^2 - T_h T_c = 0. \]
+<p>이 2차방정식의 해는 \(T_{hw} = \tfrac12\big(T_h \pm \sqrt{T_h T_c}\big)\)입니다. 음의 근은 \(\tfrac12(T_h+T_c)\)보다 작아서 \(T_{cw}\)를 음수로 만들므로 물리적이지 않습니다. \(d^2P/dT_{hw}^2 = -2K T_hT_c/(2T_{hw}-T_h)^3 < 0\)이므로 양의 근이 최댓값입니다.</p>
+<div class="box answer">
+\[ T_{hw}^{*} = \tfrac12\left(T_h + \sqrt{T_h T_c}\right), \qquad T_{cw}^{*} = \frac{T_c\,T_{hw}^*}{\sqrt{T_hT_c}} = \tfrac12\left(T_c + \sqrt{T_h T_c}\right). \]
+</div>
+<p>각 작동 온도는 해당 열원의 온도와 기하평균 \(\sqrt{T_hT_c}\)의 정확히 중간에 놓입니다. 다시 대입하면 최대 일률은</p>
+\[ P_{\max} = \frac{K}{4}\left(\sqrt{T_h} - \sqrt{T_c}\right)^2 \]
+<p>이며, 이는 Curzon–Ahlborn 논문의 식 (19)에서 \(\alpha = \beta = K\)로 둔 것과 같습니다.</p>
+</div></div>
+
+<div class="part"><div class="tag">4</div><div>
+<h3>최대 일률에서의 효율</h3>
+<p>효율은 제1법칙과 1단계의 엔트로피 균형으로부터 바로 나옵니다.</p>
+\[ \eta = 1 - \frac{Q_c}{Q_h} = 1 - \frac{T_{cw}^*}{T_{hw}^*} = 1 - \frac{\sqrt{T_c}\,(\sqrt{T_c} + \sqrt{T_h})}{\sqrt{T_h}\,(\sqrt{T_h} + \sqrt{T_c})} \quad\Longrightarrow\quad \boxed{\;\eta_{CA} = 1 - \sqrt{T_c/T_h}\;} \]
+<p>석탄 화력 증기 터빈의 경우 \(T_h = 600\,^\circ\mathrm{C} = 873.15\ \mathrm K\), \(T_c = 25\,^\circ\mathrm{C} = 298.15\ \mathrm K\)이므로</p>
+\[ \eta_{CA} = 1 - \sqrt{\tfrac{298.15}{873.15}} \approx 0.416, \qquad \eta_C = 1 - \tfrac{298.15}{873.15} \approx 0.659. \]
+<p>최대 일률에서 작동 온도는 \(T_{hw}^* \approx 691.7\ \mathrm K\)(418.5 °C), \(T_{cw}^* \approx 404.2\ \mathrm K\)(131.0 °C)입니다. 약 42%인 Curzon–Ahlborn 값은 66%인 카르노 한계보다 실제 석탄 발전소의 효율(약 40%)에 훨씬 가깝습니다. 실제 발전소는 준정적 극한에 다가가는 것이 아니라 일률을 내도록 설계되고 운전되기 때문입니다.</p>
+</div></div>
+
+<div class="prose">
+<h2>엔트로피는 어디서 생기는가</h2>
+<p>작동 물질의 엔트로피는 매 순환마다 원래 값으로 돌아오지만 열원은 그렇지 않습니다. 고온 열원이 잃는 \(Q_h/T_h\)는 엔진이 흡수하는 \(Q_h/T_{hw}\)보다 작고, 저온 열원이 얻는 \(Q_c/T_c\)는 엔진이 방출하는 \(Q_c/T_{cw}\)보다 큽니다. 따라서 한 순환 동안 생성되는 전체 엔트로피는</p>
+\[ \Delta S_{\rm tot} = \frac{Q_c}{T_c} - \frac{Q_h}{T_h} > -\frac{Q_h}{T_{hw}} + \frac{Q_c}{T_{cw}} = 0. \]
+<p>이를 제1법칙과 결합하면 간결한 에너지 수지(Gouy–Stodola 관계)를 얻으며, 데모의 색 막대가 바로 이것을 보여줍니다.</p>
+\[ W = \eta_C\,Q_h - T_c\,\Delta S_{\rm tot}. \]
+<p>벽에서 생성된 엔트로피는 그만큼 \(T_c\)를 곱한 양의 일을 잃게 만듭니다. 슬라이더의 양 끝 두 극한에서 이 절충 관계가 분명해집니다.</p>
+<p><strong>준정적 극한</strong>(\(T_{hw}\to T_h,\ T_{cw}\to T_c\)). 온도 차이가 사라져 엔트로피가 생성되지 않고 \(\eta \to \eta_C\)가 됩니다. 하지만 유한한 열을 옮기려면 열전도 법칙에 의해 \(\Delta t \to \infty\)가 되어야 하므로 일률은 0으로 갑니다.</p>
+<p><strong>단락 극한</strong>(\(T_{hw}\to T_{cw}\)). 열은 최대한 빨리 흐르지만, 내부의 카르노 엔진이 같은 두 온도 사이에서 작동하게 되어 일을 전혀 하지 못하고 열을 고온에서 저온으로 그냥 통과시킵니다. 전지를 도선으로 단락시킨 것과 비슷합니다. 일률과 효율이 모두 0이 됩니다.</p>
+<p>최대 일률 지점은 이 두 개의 0 사이의 절충점이며, 그 효율은 신기하게도 열원의 온도에만 의존합니다.</p>
+</div>
+
+<div class="prose">
+<h2>실제 발전소와의 비교</h2>
+<p>Curzon과 Ahlborn은 논문의 Table I에서 자신들의 공식을 실제 가동 중인 발전소와 비교했습니다. 아래 값은 표에 적힌 온도로 다시 계산한 것이며, 맨 위에는 Schroeder가 예로 든 전형적인 석탄 화력 터빈을 추가했습니다.</p>
+</div>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>발전원</th><th>\(T_{c}\) (°C)</th><th>\(T_{h}\) (°C)</th><th>\(\eta_{C}\)</th><th>\(\eta_{CA}\)</th><th>실측 \(\eta\)</th></tr></thead>
+  <tbody id="plantRows"></tbody>
+</table>
+</div>
+<p class="note prose">실측 효율은 Curzon과 Ahlborn(1975)의 Table I에서 가져왔고, 전형적인 석탄 발전소의 40%는 Schroeder가 인용한 값입니다. 원 논문의 표와 약간 다른 것은 섭씨–켈빈 변환의 반올림 차이 때문입니다.</p>
+
+<div class="prose">
+<h2>단순화 가정이 결과를 바꿀까?</h2>
+<p>Schroeder 교과서의 각주에 따르면, 최종 효율을 얻는 데 두 열전도 계수가 같다는 가정도, 두 등온 과정의 시간이 같다는 가정도 필요하지 않습니다. Curzon과 Ahlborn은 고온 쪽 \(\alpha\)와 저온 쪽 \(\beta\)를 다르게 두고 등온 과정의 시간 \(t_1, t_2\)도 자유롭게 두었습니다. 두 작동 온도에 대해 모두 최대화하면</p>
+\[ T_{hw}^* = C\sqrt{T_h},\quad T_{cw}^* = C\sqrt{T_c},\quad C = \frac{\sqrt{\alpha T_h} + \sqrt{\beta T_c}}{\sqrt{\alpha} + \sqrt{\beta}},\quad \frac{t_1}{t_2} = \sqrt{\frac{\beta}{\alpha}} \]
+<p>이므로 다시 \(T_{cw}^*/T_{hw}^* = \sqrt{T_c/T_h}\)가 됩니다. \(\alpha = \beta\)이면 최적 시간이 저절로 같아지므로, 이 경우 Schroeder의 \(\Delta t\)가 같다는 가정은 아무런 손해도 없습니다. 아래 위젯은 열전도 계수가 다른데도 시간을 같게 강제하면 어떻게 되는지도 확인합니다. 최적점이 이동하고 일률은 줄어들지만, 최대 일률에서의 효율은 여전히 \(\eta_{CA}\)입니다.</p>
+</div>
+<div class="widget ui">
+  <div class="ctl">
+    <label for="ratio"><span>열전도 계수 비 \(\alpha/\beta = K_h/K_c\)</span> <output id="ratioOut"></output></label>
+    <input id="ratio" type="range" min="-100" max="100" step="1" value="-60">
+  </div>
+  <p class="note" style="margin-top:-.3rem">열원 온도는 맨 위 데모의 슬라이더 값을 따릅니다.</p>
+  <div class="cols2">
+    <div>
+      <h4>시간을 자유롭게 둔 경우 (Curzon–Ahlborn)</h4>
+      <dl class="kv" id="genFree"><dt>\(T_{hw}^*\)</dt><dd id="gfThw"></dd><dt>\(T_{cw}^*\)</dt><dd id="gfTcw"></dd><dt>\(t_1/t_2\)</dt><dd id="gfT12"></dd><dt>최대 일률 효율 \(\eta\)</dt><dd id="gfEta"></dd><dt>최대 일률</dt><dd>100% (기준)</dd></dl>
+    </div>
+    <div>
+      <h4>시간을 같게 강제한 경우</h4>
+      <dl class="kv" id="genEq"><dt>\(T_{hw}^*\)</dt><dd id="geThw"></dd><dt>\(T_{cw}^*\)</dt><dd id="geTcw"></dd><dt>\(t_1/t_2\)</dt><dd>1 (강제)</dd><dt>최대 일률 효율 \(\eta\)</dt><dd id="geEta"></dd><dt>최대 일률</dt><dd id="geP"></dd></dl>
+    </div>
+  </div>
+</div>
+
+<div class="prose">
+<h2>덧붙임: 양자점 열기관</h2>
+<p>Curzon–Ahlborn의 결과는 <strong>최대 일률에서의 효율</strong>에 관한 긴 연구 흐름의 출발점이 되었습니다. Van den Broeck은 평형 근처(작은 \(\eta_C\))에서 선형 비가역 열역학을 이용해, 열 흐름이 일을 만드는 흐름에 정확히 비례하는 "강결합(tight coupling)" 엔진이라면 \(\eta_{\rm op} \approx \tfrac12\eta_C\)여야 함을 보였습니다. \(\eta_{CA} = \tfrac12\eta_C + \tfrac18\eta_C^2 + \tfrac1{16}\eta_C^3 + \cdots\)이므로 Curzon–Ahlborn 엔진도 이를 만족합니다.</p>
+<p>이상훈(강의 담당 교수), 엄재곤, 박형규의 2018년 연구는 이 "\(\tfrac12\)-보편성"이 얼마나 견고한지를, 상상할 수 있는 가장 단순한 엔진 중 하나로 살펴보았습니다. 에너지 \(E_{\rm QD}\)(\(\mu_1\) 기준)의 단일 양자점 준위가 고온 도선(\(T_1\))과, 화학 퍼텐셜이 더 높은(\(\Delta\mu = \mu_2 - \mu_1\)) 저온 도선(\(T_2\))을 잇는 구조입니다. 전자 하나가 통과할 때마다 고온 도선에서 열 \(E_{\rm QD}\)를 가져와 일 \(\Delta\mu\)를 하므로</p>
+\[ J = \tfrac12\left[\frac{1}{e^{E_{\rm QD}/T_1}+1} - \frac{1}{e^{(E_{\rm QD}-\Delta\mu)/T_2}+1}\right],\qquad \dot W = J\,\Delta\mu,\qquad \eta = \frac{\Delta\mu}{E_{\rm QD}} \]
+<p>입니다(\(k_B = 1\)). 이 엔진은 구조적으로 강결합 조건을 만족합니다. 내부가역 엔진에서 \(T_{hw}\)가 하던 역할을 이제 두 개의 손잡이가 맡습니다. 게이트 전압이 \(E_{\rm QD}\)를, 소스–드레인 전압이 \(\Delta\mu\)를 정합니다. 어떤 손잡이를 돌릴 수 있느냐가 결과를 크게 바꾼다는 것이 핵심입니다.</p>
+<p><strong>두 손잡이 모두 자유(전역 최적화).</strong> \(\eta_{\rm op} = \tfrac12\eta_C + \tfrac18\eta_C^2 + 0.0775\,\eta_C^3 + \cdots\)로, 2차까지는 Curzon–Ahlborn과 같고 3차에서야 CA 계수 \(1/16\)과 달라집니다.</p>
+<p><strong>게이트 고정, \(\Delta\mu\) 조절.</strong> \(\tfrac12\)은 유지되지만 2차 계수가 \(E_{\rm QD}\)에 의존합니다: \(\eta_{\rm op} = \tfrac12\eta_C + \tfrac{E_{\rm QD}}{16T_2}\tanh\!\big(\tfrac{E_{\rm QD}}{2T_2}\big)\eta_C^2 + \cdots\).</p>
+<p><strong>바이어스 고정, 게이트 조절.</strong> 여기서는 보편성이 깨집니다: \(\eta_{\rm op} \approx \eta_C - (T_2/\Delta\mu)\,\eta_C^2\)로, 선형 계수가 \(\tfrac12\)이 아니라 1입니다. 전개의 기준점 \(E_{\rm QD}\to\infty\)는 흐름이 0이지만 평형이 <strong>아닌</strong> 점이므로 선형 응답 이론이 적용되지 않습니다. 역학적 흐름은 선형이 아니라 본질적 특이성(essential singularity)을 가지며 사라집니다. 흐름이 \(J_2 \propto (X_2 + \xi' X_t)X_2^{\,n}\)처럼 행동한다면 \(\eta_{\rm op} = \frac{n+1}{n+2}\eta_C\)를 얻는데, 보통의 선형 경우 \(n=0\)은 \(\tfrac12\)을, 본질적 특이성은 \(n\to\infty\)처럼 작용하여 1을 줍니다. 게이트 전압을 조절한 Josefsson 등(2018)의 양자점 실험에서도 \(\eta_{CA}\)보다 훨씬 높은 최대 일률 효율이 보고되어 이 그림과 부합합니다.</p>
+<p>아래 곡선은 \(\dot W\)를 수치적으로 최대화하여 실시간으로 계산한 것입니다(\(T_2 = 1\)).</p>
+</div>
+<div class="widget">
+  <div class="qd-grid">
+    <figure style="margin:0">
+      <svg id="plotQD" viewBox="0 0 560 380" role="img" aria-label="양자점 엔진의 카르노 효율에 따른 최대 일률 효율"></svg>
+    </figure>
+    <div class="ui">
+      <div class="ctl">
+        <label for="eqd"><span>고정한 게이트 준위 \(E_{\rm QD}/T_2\)</span> <output id="eqdOut"></output></label>
+        <input id="eqd" type="range" min="0.5" max="6" step="0.1" value="2">
+      </div>
+      <div class="ctl">
+        <label for="dmu"><span>고정한 바이어스 \(\Delta\mu/T_2\)</span> <output id="dmuOut"></output></label>
+        <input id="dmu" type="range" min="0.2" max="4" step="0.1" value="1">
+      </div>
+      <div class="legend" style="flex-direction:column;gap:.3rem;font-size:.86rem" id="qdLegend"><span><i class="sw" style="background:var(--ink)"></i>두 손잡이 모두 자유 (전역 최적화)</span><span><i class="sw" style="background:var(--cold)"></i>게이트 고정 \(E_{\rm QD}\) = <span id="lgE"></span>, 바이어스 조절</span><span><i class="sw" style="background:var(--quant)"></i>바이어스 고정 \(\Delta\mu\) = <span id="lgMu"></span>, 게이트 조절</span><span><i class="sw" style="background:var(--work)"></i>Curzon–Ahlborn, \(1-\sqrt{1-\eta_C}\)</span><span><i class="sw" style="background:var(--muted)"></i>기준선 \(\eta_C\) (점선), \(\eta_C/2\) (파선)</span></div>
+      <p class="note">작은 \(\eta_{C}\)에서 바이어스를 고정한 곡선은 \(\eta_{C}\)에 붙어 가고, 나머지는 \(\eta_C/2\)를 따라 시작합니다. \(\eta_C = 1\) 근처에서는 바이어스 고정 최적값이 로그적으로 무너지므로, 전역 최적화가 다시 앞서는 교차점이 생깁니다.</p>
+    </div>
+  </div>
+</div>
+<div class="prose">
+<p>정리하면, "최대 일률에서의 효율"은 엔진마다 하나로 정해진 숫자가 아닙니다. 수송 법칙(선형 열전도는 Curzon–Ahlborn을 줍니다), 어떤 변수를 최적화하는지, 그리고 전개의 기준이 되는 상태가 진짜 평형인지에 따라 달라집니다. Curzon–Ahlborn 엔진에서는 시간을 같게 강제해도 \(\eta_{CA}\)가 그대로이지만, 양자점에서는 바이어스 대신 게이트를 고르는 것만으로 선형 차수의 답이 바뀝니다.</p>
+</div>
+
+<footer>
+<p>이 페이지는 Claude Opus 5.5(Anthropic)가 통계물리 1 강의의 보충 자료로 제작했습니다. 유도 과정과 인터랙티브 그림은 모델이 생성한 것이므로 아래 참고문헌과 함께 읽기 바랍니다. 소스 코드: GitHub의 <a href="https://github.com/lshlj82/Chambadal-Novikov-Curzon-Ahlborn-engine">Chambadal-Novikov-Curzon-Ahlborn</a>.</p>
+<ol>
+  <li>P. Chambadal, <em>Les centrales nucléaires</em> (Armand Colin, Paris, 1957), pp. 41–58.</li>
+  <li>I. I. Novikov, “Efficiency of atomic energy installation,” <em>Atomnaya Energiya</em> <strong>3</strong>(11), 409–412 (1957).</li>
+  <li>I. I. Novikov, “The efficiency of atomic power stations (a review),” <em>Journal of Nuclear Energy</em> <strong>7</strong>(1–2), 125–128 (1958). <a href="https://doi.org/10.1016/0891-3919(58)90244-4">doi:10.1016/0891-3919(58)90244-4</a></li>
+  <li>D. V. Schroeder, <em>An Introduction to Thermal Physics</em> (Addison-Wesley, 2000), Problem 4.6.</li>
+  <li>F. L. Curzon and B. Ahlborn, “Efficiency of a Carnot engine at maximum power output,” <em>American Journal of Physics</em> <strong>43</strong>, 22–24 (1975). 교과서 각주에는 41권으로 적혀 있으나 논문은 43권에 실려 있습니다.</li>
+  <li>S. H. Lee, J. Um, and H. Park, “Nonuniversality of heat-engine efficiency at maximum power,” <em>Physical Review E</em> <strong>98</strong>, 052137 (2018). <a href="https://doi.org/10.1103/PhysRevE.98.052137">doi:10.1103/PhysRevE.98.052137</a></li>
+  <li>C. Van den Broeck, “Thermodynamic efficiency at maximum power,” <em>Physical Review Letters</em> <strong>95</strong>, 190602 (2005), and M. Josefsson <em>et al.</em>, <em>Nature Nanotechnology</em> <strong>13</strong>, 920 (2018), (참고문헌 6에서 재인용).</li>
+</ol>
+</footer>
+</main>
+
+<script>
+(function(){
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const toK = c => c + 273.15;
+const pct = x => (100*x).toFixed(1) + '%';
+const f1 = x => x.toFixed(1);
+
+function el(tag, attrs, parent, text){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function niceTicks(a, b, n){
+  const span = b - a; if (span <= 0) return [a];
+  const raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1,2,2.5,5,10].map(m=>m*mag).find(s => s >= raw) || 10*mag;
+  const out = []; for (let t = Math.ceil(a/step)*step; t <= b + 1e-9*step; t += step) out.push(+t.toFixed(10));
+  return out;
+}
+// Generic line plot into an SVG with viewBox W x H
+function plot(svg, o){
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+  const m = {l:58, r:16, t:16, b:46};
+  const X = x => m.l + (x - o.xmin)/(o.xmax - o.xmin)*(W - m.l - m.r);
+  const Y = y => H - m.b - (y - o.ymin)/(o.ymax - o.ymin)*(H - m.t - m.b);
+  const g = el('g', {}, svg);
+  niceTicks(o.xmin, o.xmax, o.xticks || 5).forEach(t=>{
+    el('line',{x1:X(t),x2:X(t),y1:m.t,y2:H-m.b,style:'stroke:var(--rule);stroke-width:1'},g);
+    el('text',{x:X(t),y:H-m.b+16,'text-anchor':'middle','font-size':12,style:'fill:var(--muted)'},g,(o.xfmt||String)(t));
+  });
+  niceTicks(o.ymin, o.ymax, o.yticks || 5).forEach(t=>{
+    el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),style:'stroke:var(--rule);stroke-width:1'},g);
+    el('text',{x:m.l-7,y:Y(t)+4,'text-anchor':'end','font-size':12,style:'fill:var(--muted)'},g,(o.yfmt||String)(t));
+  });
+  const lab = (t, str) => str.split(/(_\{[^}]*\})/).forEach(part=>{
+    if (part.startsWith('_{')) el('tspan',{'baseline-shift':'sub','font-size':10},t,part.slice(2,-1));
+    else if (part) el('tspan',{},t,part);
+  });
+  lab(el('text',{x:(m.l+W-m.r)/2,y:H-8,'text-anchor':'middle','font-size':13,style:'fill:var(--ink)'},g), o.xlabel);
+  lab(el('text',{x:14,y:(m.t+H-m.b)/2,'text-anchor':'middle','font-size':13,transform:`rotate(-90 14 ${(m.t+H-m.b)/2})`,style:'fill:var(--ink)'},g), o.ylabel);
+  (o.series||[]).forEach(s=>{
+    const d = s.pts.filter(p=>isFinite(p[1])).map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(2)+','+Y(Math.max(o.ymin,Math.min(o.ymax,p[1]))).toFixed(2)).join('');
+    el('path',{d, style:`fill:none;stroke:${s.color};stroke-width:${s.width||2.4};${s.dash?'stroke-dasharray:'+s.dash:''}`},g);
+  });
+  (o.points||[]).forEach(p=>{
+    el('circle',{cx:X(p.x),cy:Y(p.y),r:p.r||6,style:p.hollow?`fill:var(--panel);stroke:${p.color};stroke-width:2.5`:`fill:${p.color};stroke:var(--panel);stroke-width:2`},g);
+  });
+  return {X, Y, g};
+}
+
+/* ---------------- Light/dark toggle ---------------- */
+const root = document.documentElement, mq = window.matchMedia('(prefers-color-scheme: dark)');
+const currentTheme = () => root.getAttribute('data-theme') || (mq.matches ? 'dark' : 'light');
+function syncThemeBtn(){
+  const t = currentTheme(), b = $('themeBtn');
+  b.textContent = t === 'dark' ? '☀ 라이트 모드' : '☾ 다크 모드';
+  b.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+}
+$('themeBtn').addEventListener('click', ()=>{
+  const next = currentTheme() === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('cnca-theme', next); } catch(e) {}
+  syncThemeBtn();
+});
+if (mq.addEventListener) mq.addEventListener('change', syncThemeBtn);
+syncThemeBtn();
+
+/* ---------------- Endoreversible engine lab ---------------- */
+const S = { Th:600, Tc:25, s:0.5 };
+function geom(){
+  const Th = toK(S.Th), Tc = toK(S.Tc), lo = (Th + Tc)/2;
+  const Tstar = 0.5*(Th + Math.sqrt(Th*Tc));
+  return {Th, Tc, lo, Tstar, sStar:(Tstar - lo)/(Th - lo)};
+}
+function engineAt(Th, Tc, Thw){
+  const Tcw = Tc*Thw/(2*Thw - Th);
+  const qh = (Th - Thw)/2, qc = (Tcw - Tc)/2;           // cycle-averaged heat rates / K
+  const P = qh - qc;
+  const eta = Thw > 0 ? 1 - Tcw/Thw : 0;
+  const Sdot = qc/Tc - qh/Th;                             // entropy production rate / K
+  return {Thw, Tcw, qh, qc, P, eta, Sdot};
+}
+
+function drawDiagram(G, E){
+  const svg = $('diagram'); while (svg.firstChild) svg.removeChild(svg.firstChild);
+  const {Th, Tc} = G;
+  // Temperature ladder
+  const top = 40, bot = 390, x0 = 64;
+  const Tmin = Tc - 0.06*(Th-Tc), Tmax = Th + 0.06*(Th-Tc);
+  const Ty = T => bot - (T - Tmin)/(Tmax - Tmin)*(bot - top);
+  const grad = el('linearGradient',{id:'tg',x1:0,y1:0,x2:0,y2:1}, el('defs',{},svg));
+  el('stop',{offset:'0%',style:'stop-color:var(--hot)'},grad); el('stop',{offset:'100%',style:'stop-color:var(--cold)'},grad);
+  el('rect',{x:x0-5,y:top,width:10,height:bot-top,rx:5,fill:'url(#tg)'},svg);
+  // engine span on ladder
+  el('rect',{x:x0-14,y:Ty(E.Thw),width:28,height:Math.max(1,Ty(E.Tcw)-Ty(E.Thw)),rx:4,style:'fill:var(--engine);opacity:.85;stroke:var(--engine-ink);stroke-width:1'},svg);
+  const marks = [[Th,'T','h','var(--hot)'],[E.Thw,'T','hw','var(--engine-ink)'],[E.Tcw,'T','cw','var(--engine-ink)'],[Tc,'T','c','var(--cold)']];
+  // label placement with minimal separation
+  let ys = marks.map(mk=>Ty(mk[0]));
+  for (let i=1;i<ys.length;i++) if (ys[i]-ys[i-1] < 15) ys[i] = ys[i-1]+15;
+  marks.forEach((mk,i)=>{
+    el('line',{x1:x0+6,x2:x0+14,y1:Ty(mk[0]),y2:Ty(mk[0]),style:'stroke:var(--ink);stroke-width:1.5'},svg);
+    const t = el('text',{x:x0+18,y:ys[i]+4,'font-size':12.5,style:'fill:var(--ink)'},svg);
+    el('tspan',{'font-style':'italic'},t,'T'); el('tspan',{'baseline-shift':'sub','font-size':9},t,mk[2]);
+    el('tspan',{dx:4},t,f1(mk[0]-273.15)+' °C');
+  });
+  // Reservoirs
+  const RX = 190, RW = 300;
+  el('rect',{x:RX,y:14,width:RW,height:48,rx:8,style:'fill:var(--hot-soft);stroke:var(--hot);stroke-width:1.5'},svg);
+  el('text',{x:RX+RW/2,y:43,'text-anchor':'middle','font-size':14,'font-weight':600,style:'fill:var(--hot)'},svg,'고온 열원');
+  el('rect',{x:RX,y:368,width:RW,height:48,rx:8,style:'fill:var(--cold-soft);stroke:var(--cold);stroke-width:1.5'},svg);
+  el('text',{x:RX+RW/2,y:397,'text-anchor':'middle','font-size':14,'font-weight':600,style:'fill:var(--cold)'},svg,'저온 열원');
+  // Engine
+  const EX = 230, EW = 200, EY = 150, EH = 120;
+  el('rect',{x:EX,y:EY,width:EW,height:EH,rx:6,style:'fill:var(--engine)'},svg);
+  el('text',{x:EX+EW/2,y:EY+30,'text-anchor':'middle','font-size':13,style:'fill:var(--engine-ink)'},svg,'가역 카르노 엔진');
+  el('text',{x:EX+EW/2,y:EY+48,'text-anchor':'middle','font-size':13,style:'fill:var(--engine-ink)'},svg,'작동 온도');
+  const tl = el('text',{x:EX+EW/2,y:EY+76,'text-anchor':'middle','font-size':15,'font-weight':600,style:'fill:var(--engine-ink)'},svg);
+  tl.textContent = f1(E.Thw-273.15)+' °C ↔ '+f1(E.Tcw-273.15)+' °C';
+  el('text',{x:EX+EW/2,y:EY+102,'text-anchor':'middle','font-size':12,style:'fill:var(--engine-ink)'},svg,'η = '+pct(E.eta));
+  // Arrows, widths proportional to cycle-averaged flows
+  const maxQ = (Th - G.lo)/2;
+  const w = v => 3 + 40*Math.max(0,v)/maxQ;
+  const cx = EX + EW/2;
+  function vArrow(y1, y2, wd, color){
+    const h = Math.min(16, (y2-y1)*0.45), hw = Math.max(wd/2+7, 10);
+    el('polygon',{points:[[cx-wd/2,y1],[cx+wd/2,y1],[cx+wd/2,y2-h],[cx+hw,y2-h],[cx,y2],[cx-hw,y2-h],[cx-wd/2,y2-h]].map(p=>p.join(',')).join(' '),style:`fill:${color}`},svg);
+  }
+  vArrow(64, EY-2, w(E.qh), 'var(--hot)');
+  vArrow(EY+EH+2, 366, w(E.qc), 'var(--cold)');
+  const pw = w(E.P), ay = EY+EH/2, ax1 = EX+EW+2, ax2 = 512;
+  el('polygon',{points:[[ax1,ay-pw/2],[ax2-16,ay-pw/2],[ax2-16,ay-pw/2-7],[ax2,ay],[ax2-16,ay+pw/2+7],[ax2-16,ay+pw/2],[ax1,ay+pw/2]].map(p=>p.join(',')).join(' '),style:'fill:var(--work)'},svg);
+  el('text',{x:(ax1+ax2)/2-6,y:ay-pw/2-12,'text-anchor':'middle','font-size':13,'font-weight':600,style:'fill:var(--work)'},svg,'일');
+  // flow labels
+  const flow = (x, y, sub, v, c) => { const t = el('text',{x,y,'font-size':12.5,style:'fill:'+c},svg);
+    el('tspan',{'font-style':'italic'},t,'Q̇'); el('tspan',{'baseline-shift':'sub','font-size':9},t,sub);
+    el('tspan',{},t,'/'); el('tspan',{'font-style':'italic'},t,'K'); el('tspan',{},t,' = '+f1(v)+' K'); };
+  flow(cx+w(E.qh)/2+14, 112, 'h', E.qh, 'var(--hot)');
+  flow(cx+w(E.qc)/2+14, 322, 'c', E.qc, 'var(--cold)');
+}
+
+function renderLab(){
+  const G = geom();
+  const Thw = G.lo + S.s*(G.Th - G.lo);
+  const E = engineAt(G.Th, G.Tc, Thw);
+  const etaC = 1 - G.Tc/G.Th, etaCA = 1 - Math.sqrt(G.Tc/G.Th);
+  $('thOut').textContent = S.Th + ' °C (' + f1(G.Th) + ' K)';
+  $('tcOut').textContent = S.Tc + ' °C (' + f1(G.Tc) + ' K)';
+  $('thwOut').textContent = f1(Thw-273.15) + ' °C (' + f1(Thw) + ' K)';
+  $('rTcw').textContent = f1(E.Tcw-273.15) + ' °C';
+  $('rP').textContent = E.P.toFixed(1) + ' K';
+  $('rEta').textContent = pct(E.eta);
+  $('rEtaC').textContent = pct(etaC);
+  $('rEtaCA').textContent = pct(etaCA);
+  $('rS').textContent = E.Sdot.toFixed(4);
+  // budget bar: qh = P + Tc*Sdot + (Tc/Th) qh
+  const lost = G.Tc*E.Sdot, rev = (G.Tc/G.Th)*E.qh, tot = E.qh || 1;
+  $('bW').style.width = (100*Math.max(0,E.P)/tot)+'%';
+  $('bL').style.width = (100*Math.max(0,lost)/tot)+'%';
+  $('bR').style.width = (100*Math.max(0,rev)/tot)+'%';
+  const key = Math.abs(S.s - G.sStar) < 0.004 ? 'max' : S.s > 0.96 ? 'qs' : S.s < 0.04 ? 'sc' : (S.s > G.sStar ? 'mid-qs' : 'mid-sc');
+  document.querySelectorAll('#status [data-st]').forEach(n=>{ n.hidden = n.dataset.st !== key; });
+  $('stEta').textContent = pct(etaCA);
+  drawDiagram(G, E);
+  // Plots
+  const N = 240, pts = [], pe = [];
+  for (let i=0;i<=N;i++){
+    const T = G.lo + (G.Th - G.lo)*i/N, e = engineAt(G.Th, G.Tc, T);
+    pts.push([T-273.15, e.P]); pe.push([e.eta, e.P]);
+  }
+  const Ps = engineAt(G.Th, G.Tc, G.Tstar);
+  const ymax = Ps.P*1.12;
+  plot($('plotP'), {xmin:G.lo-273.15, xmax:G.Th-273.15, ymin:0, ymax, xlabel:'고온 쪽 작동 온도 T_{hw} (°C)', ylabel:'일률 P/K (K)',
+    series:[{pts, color:'var(--ink)'}],
+    points:[{x:G.Tstar-273.15, y:Ps.P, color:'var(--work)', hollow:true, r:7},{x:Thw-273.15, y:E.P, color:'var(--hot)'}]});
+  plot($('plotPE'), {xmin:0, xmax:Math.ceil(etaC*20)/20, ymin:0, ymax, xlabel:'효율 η', ylabel:'일률 P/K (K)', xfmt:t=>Math.round(t*100)+'%',
+    series:[{pts:pe, color:'var(--ink)'},{pts:[[etaCA,0],[etaCA,ymax]], color:'var(--work)', width:1.5, dash:'5 4'},{pts:[[etaC,0],[etaC,ymax]], color:'var(--muted)', width:1.5, dash:'2 4'}],
+    points:[{x:etaCA, y:Ps.P, color:'var(--work)', hollow:true, r:7},{x:E.eta, y:E.P, color:'var(--hot)'}]});
+  $('thw').value = Math.round(S.s*1000); $('thw2').value = Math.round(S.s*1000);
+  renderPV(G, Thw); renderGeneral(); renderPlants();
+}
+function setS(s){ S.s = Math.max(0, Math.min(1, s)); $('thw').value = Math.round(S.s*1000); renderLab(); }
+$('thw').addEventListener('input', e=>{ S.s = +e.target.value/1000; renderLab(); });
+$('th').addEventListener('input', e=>{ S.Th = +e.target.value; renderLab(); });
+$('tc').addEventListener('input', e=>{ S.Tc = +e.target.value; renderLab(); });
+$('toMax').addEventListener('click', ()=>{ const G = geom(); S.s = G.sStar; $('thw').value = Math.round(G.sStar*1000); renderLab(); });
+$('toQS').addEventListener('click', ()=>setS(0.985));
+$('toSC').addEventListener('click', ()=>setS(0.02));
+
+const AXV = '부피 V/V_{1}', AXP = '압력 p (단위 NkK/V_{1})';
+/* ---------------- P–V diagram of the working cycle ---------------- */
+function renderPV(G, Thw){
+  const gam = 5/3, ex = 1/(gam-1), Th = G.Th, Tc = G.Tc;
+  const Tcw = Tc*Thw/(2*Thw - Th);
+  const c = Math.log(3)*G.Tstar/(Th - G.Tstar);              // K*dt/(Nk)
+  const cyc = T => { const tc = Tc*T/(2*T - Th), Qh = c*(Th - T), r = Math.exp(Qh/T), a = Math.pow(T/tc, ex);
+    return {Thw:T, Tcw:tc, Qh, Qc:Qh*tc/T, W:Qh*(1-tc/T), V1:1, V2:r, V3:r*a, V4:a}; };
+  const C = cyc(Thw), Cs = cyc(G.Tstar);
+  let Vmax = 1; for (let i=0;i<=200;i++){ const T = G.lo + (Th - G.lo)*i/200; Vmax = Math.max(Vmax, cyc(Math.min(Th, Math.max(G.lo+1e-6, T))).V3); }
+  Vmax *= 1.05;
+  const iso = (T, a, b, n=60) => Array.from({length:n+1}, (_,i)=>{ const V = a*Math.pow(b/a, i/n); return [V, T/V]; });
+  const adi = (V0, p0, a, b, n=60) => Array.from({length:n+1}, (_,i)=>{ const V = a*Math.pow(b/a, i/n); return [V, p0*Math.pow(V0/V, gam)]; });
+  const seg12 = iso(Thw, C.V1, C.V2), seg23 = adi(C.V2, Thw/C.V2, C.V2, C.V3), seg34 = iso(C.Tcw, C.V3, C.V4), seg41 = adi(C.V4, C.Tcw/C.V4, C.V4, C.V1);
+  const pmax = Th*1.08;
+  const ctx = plot($('plotPV'), {xmin:0, xmax:Vmax, ymin:0, ymax:pmax, xlabel:AXV, ylabel:AXP,
+    series:[{pts:iso(Th, Th/pmax, Vmax), color:'var(--hot)', width:1.2, dash:'5 4'},{pts:iso(Tc, Tc/pmax, Vmax), color:'var(--cold)', width:1.2, dash:'5 4'}]});
+  const {X, Y, g} = ctx;
+  const pts = [...seg12, ...seg23, ...seg34, ...seg41];
+  el('path',{d:pts.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(2)+','+Y(p[1]).toFixed(2)).join('')+'Z', style:'fill:var(--work);opacity:.22;stroke:none'}, g);
+  const line = (s, color, w) => el('path',{d:s.map((p,i)=>(i?'L':'M')+X(p[0]).toFixed(2)+','+Y(p[1]).toFixed(2)).join(''), style:`fill:none;stroke:${color};stroke-width:${w};stroke-linejoin:round`}, g);
+  line(seg12,'var(--hot)',3); line(seg34,'var(--cold)',3); line(seg23,'var(--muted)',2.2); line(seg41,'var(--muted)',2.2);
+  // direction arrowheads at segment midpoints
+  [[seg12,'var(--hot)'],[seg23,'var(--muted)'],[seg34,'var(--cold)'],[seg41,'var(--muted)']].forEach(([s,col])=>{
+    const m = Math.floor(s.length/2), p = s[m], q = s[m+1] || s[m];
+    const x1 = X(p[0]), y1 = Y(p[1]), x2 = X(q[0]), y2 = Y(q[1]), ang = Math.atan2(y2-y1, x2-x1);
+    if (!isFinite(ang) || Math.hypot(x2-x1,y2-y1) < 1e-6) return;
+    const L = 9, Wd = 5, c1 = Math.cos(ang), s1 = Math.sin(ang);
+    el('polygon',{points:[[x1+L*c1, y1+L*s1],[x1-Wd*s1, y1+Wd*c1],[x1+Wd*s1, y1-Wd*c1]].map(v=>v.map(z=>z.toFixed(1)).join(',')).join(' '), style:`fill:${col}`}, g);
+  });
+  [[C.V1, Thw/C.V1,'1',-14,-6],[C.V2, Thw/C.V2,'2',7,-9],[C.V3, C.Tcw/C.V3,'3',2,-11],[C.V4, C.Tcw/C.V4,'4',-15,14]].forEach(([V,p,lab,dx,dy])=>{
+    el('circle',{cx:X(V),cy:Y(p),r:4,style:'fill:var(--ink)'}, g);
+    el('text',{x:X(V)+dx,y:Y(p)+dy,'font-size':13,'font-weight':600,style:'fill:var(--ink)'}, g, lab);
+  });
+  $('thw2Out').textContent = f1(Thw-273.15) + ' °C (' + f1(Thw) + ' K)';
+  $('pvR').textContent = C.V2.toFixed(2);
+  $('pvQh').textContent = C.Qh.toFixed(1) + ' K';
+  $('pvQc').textContent = C.Qc.toFixed(1) + ' K';
+  $('pvW').textContent = C.W.toFixed(1) + ' K';
+  $('pvRel').textContent = pct(C.W/Cs.W);
+}
+$('thw2').addEventListener('input', e=>{ S.s = +e.target.value/1000; renderLab(); });
+
+/* ---------------- Power-plant table ---------------- */
+const plants = [
+  ['전형적인 석탄 화력 증기 터빈 (Schroeder)', 25, 600, '≈40%'],
+  ['West Thurrock (영국) 석탄 화력 발전소', 25, 565, '36%'],
+  ['CANDU (캐나다) 가압중수로', 25, 300, '30%'],
+  ['Larderello (이탈리아) 지열 발전소', 80, 250, '16%']
+];
+function renderPlants(){
+  const tb = $('plantRows'); if (tb.childElementCount) return;
+  plants.forEach(p=>{
+    const Tc = toK(p[1]), Th = toK(p[2]);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p[0]}</td><td>${p[0].startsWith('전형적인')?'':'~'}${p[1]}</td><td>${p[2]}</td><td>${pct(1-Tc/Th)}</td><td class="ca">${pct(1-Math.sqrt(Tc/Th))}</td><td>${p[3]}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ---------------- General conductances ---------------- */
+function gmax(f, a, b, it){
+  const g = (Math.sqrt(5)-1)/2; let c = b - g*(b-a), d = a + g*(b-a), fc = f(c), fd = f(d);
+  for (let i=0;i<(it||90);i++){
+    if (fc > fd){ b = d; d = c; fd = fc; c = b - g*(b-a); fc = f(c); }
+    else { a = c; c = d; fc = fd; d = a + g*(b-a); fd = f(d); }
+  }
+  const x = (a+b)/2; return [x, f(x)];
+}
+function renderGeneral(){
+  const r = Math.pow(10, +$('ratio').value/100); // Kh/Kc, with Kc = 1
+  $('ratioOut').textContent = r.toFixed(2);
+  const Th = toK(S.Th), Tc = toK(S.Tc), Kh = r, Kc = 1;
+  // Free stroke times (Curzon–Ahlborn Eqs. 11, 12, 16, 19 with gamma = 1)
+  const C = (Math.sqrt(Kh*Th) + Math.sqrt(Kc*Tc))/(Math.sqrt(Kh)+Math.sqrt(Kc));
+  const Thw = C*Math.sqrt(Th), Tcw = C*Math.sqrt(Tc);
+  const Pfree = Kh*Kc/Math.pow(Math.sqrt(Kh)+Math.sqrt(Kc),2)*Math.pow(Math.sqrt(Th)-Math.sqrt(Tc),2);
+  const t12 = Math.sqrt(Kc/Kh);
+  // Equal stroke times: entropy balance Kh(Th-Thw)/Thw = Kc(Tcw-Tc)/Tcw
+  const Pe = T => { const A = Kh*(Th-T)/T; if (A >= Kc) return -1e12; const tcw = Tc/(1-A/Kc); return (Kh*(Th-T) - Kc*(tcw-Tc))/2; };
+  // coarse scan then golden refinement
+  let best = Tc+1e-6, bv = -Infinity; const n = 400;
+  for (let i=1;i<=n;i++){ const T = Tc + (Th-Tc)*i/n, v = Pe(T); if (v > bv){ bv = v; best = T; } }
+  const step = (Th-Tc)/n;
+  const [Te, Pq] = gmax(Pe, Math.max(Tc+1e-9, best-step), Math.min(Th, best+step));
+  const Ae = Kh*(Th-Te)/Te, Tcwe = Tc/(1-Ae/Kc);
+  $('gfThw').textContent = f1(Thw-273.15)+' °C'; $('gfTcw').textContent = f1(Tcw-273.15)+' °C';
+  $('gfT12').textContent = t12.toFixed(3); $('gfEta').textContent = pct(1-Tcw/Thw);
+  $('geThw').textContent = f1(Te-273.15)+' °C'; $('geTcw').textContent = f1(Tcwe-273.15)+' °C';
+  $('geEta').textContent = pct(1-Tcwe/Te); $('geP').textContent = '자유로운 경우의 '+(100*Pq/Pfree).toFixed(1)+'%';
+}
+$('ratio').addEventListener('input', renderGeneral);
+
+/* ---------------- Quantum-dot engine ---------------- */
+const T2 = 1;
+function Wqd(E, dmu, T1){
+  const q = 1/(1+Math.exp(E/T1)), e = 1/(1+Math.exp((E-dmu)/T2));
+  return 0.5*(q-e)*dmu;
+}
+const etas = []; for (let x=0.02; x<0.951; x+=0.01) etas.push(+x.toFixed(3));
+let globalCurve = null;
+function computeGlobal(){
+  globalCurve = etas.map(ec=>{
+    const T1 = T2/(1-ec);
+    const inner = E => gmax(d=>Wqd(E,d,T1), 0, ec*E, 70);
+    const [E] = gmax(E=>inner(E)[1], 0.05, 8*T1, 70);
+    const [d] = inner(E);
+    return [ec, d/E];
+  });
+}
+function renderQD(){
+  const Eq = +$('eqd').value, dm = +$('dmu').value;
+  $('eqdOut').textContent = Eq.toFixed(1); $('dmuOut').textContent = dm.toFixed(1);
+  if (!globalCurve) computeGlobal();
+  const fixE = etas.map(ec=>{ const T1 = T2/(1-ec); const [d] = gmax(d=>Wqd(Eq,d,T1), 0, ec*Eq, 90); return [ec, d/Eq]; });
+  const fixMu = etas.map(ec=>{ const T1 = T2/(1-ec); const lo = dm/ec; const [E] = gmax(E=>Wqd(E,dm,T1), lo, lo + 60*T1, 110); return [ec, dm/E]; });
+  const ca = etas.map(ec=>[ec, 1-Math.sqrt(1-ec)]);
+  plot($('plotQD'), {xmin:0, xmax:1, ymin:0, ymax:1, xlabel:'카르노 효율 η_{C}', ylabel:'최대 일률에서의 효율 η_{op}',
+    series:[
+      {pts:[[0,0],[1,1]], color:'var(--muted)', width:1.2, dash:'2 4'},
+      {pts:[[0,0],[1,0.5]], color:'var(--muted)', width:1.2, dash:'7 5'},
+      {pts:ca, color:'var(--work)', width:2},
+      {pts:globalCurve, color:'var(--ink)', width:2.6},
+      {pts:fixE, color:'var(--cold)', width:2.4},
+      {pts:fixMu, color:'var(--quant)', width:2.6}
+    ]});
+  $('lgE').textContent = Eq.toFixed(1); $('lgMu').textContent = dm.toFixed(1);
+}
+$('eqd').addEventListener('input', renderQD);
+$('dmu').addEventListener('input', renderQD);
+
+// Start at maximum power
+const G0 = geom(); S.s = G0.sStar; $('thw').value = Math.round(G0.sStar*1000);
+renderLab(); renderQD();
+})();
+</script>
+</body>
+</html>
