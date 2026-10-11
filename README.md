@@ -4,24 +4,25 @@ An interactive web page on the "endoreversible" Carnot engine, which delivers fi
 
 The engine's efficiency at maximum power,
 
-```
-η = 1 − √(T_c / T_h),
+```math
+\eta_{\rm CA} = 1 - \sqrt{\frac{T_c}{T_h}},
 ```
 
 is widely known as the Curzon–Ahlborn efficiency after their 1975 paper in the *American Journal of Physics*. The same result had already appeared in 1957 in work by P. Chambadal and I. I. Novikov on nuclear power stations, so this project uses the name Chambadal–Novikov–Curzon–Ahlborn.
 
 ## What's on the page
 
-- **Interactive engine.** Drag the hot-side working temperature *T*<sub>hw</sub> and set the reservoir temperatures *T*<sub>h</sub> and *T*<sub>c</sub>.
+- **Interactive engine.** Drag the hot-side working temperature $`T_{hw}`$ and set the reservoir temperatures $`T_h`$ and $`T_c`$.
   - An energy-flow diagram and a temperature ladder update live as you drag.
-  - Plots show power versus *T*<sub>hw</sub> and power versus efficiency.
-  - A heat budget splits the incoming heat into work, lost work *T*<sub>c</sub>*Ṡ*, and reversible rejection.
+  - Plots show power versus $`T_{hw}`$ and power versus efficiency.
+  - A heat budget splits the incoming heat into work, lost work $`T_c\dot S`$, and reversible rejection $`(T_c/T_h)\,\dot Q_h`$.
   - Buttons jump to the maximum-power point and to the quasi-static and short-circuit limits.
-- **Step-by-step derivation.** It covers the entropy balance, the power expression, the maximization, and the efficiency at maximum power, following the setup of Problem 4.6 in Schroeder's textbook. The numerical evaluation is for a coal-fired turbine (600 °C / 25 °C): η<sub>CA</sub> ≈ 41.6% versus η<sub>C</sub> ≈ 65.9%.
-- **Entropy production and the two limits.** This section discusses the quasi-static and short-circuit limits and the Gouy–Stodola relation *W* = η<sub>C</sub>*Q*<sub>h</sub> − *T*<sub>c</sub>Δ*S*.
+- **Step-by-step derivation.** It covers the entropy balance, the power expression, the maximization, and the efficiency at maximum power, following the setup of Problem 4.6 in Schroeder's textbook. The numerical evaluation is for a coal-fired turbine (600 °C / 25 °C): $`\eta_{\rm CA} \approx 41.6\%`$ versus $`\eta_C \approx 65.9\%`$.
+- **Entropy production and the two limits.** This section discusses the quasi-static and short-circuit limits and the Gouy–Stodola relation $`W = \eta_C Q_h - T_c\,\Delta S_{\rm tot}`$.
+- **P–V diagram of the working cycle.** The Carnot cycle that the working substance actually runs between $`T_{hw}`$ and $`T_{cw}`$ is drawn live for a monatomic ideal gas. With the stroke time $`\Delta t`$ fixed, the enclosed area is proportional to the power, $`P = W/2\Delta t`$, so the loop is largest at maximum power and collapses in both limits.
 - **Comparison with real power plants.** The values from Table I of Curzon and Ahlborn are recomputed.
-- **Unequal conductances.** A widget shows that the efficiency at maximum power stays 1 − √(*T*<sub>c</sub>/*T*<sub>h</sub>) when the conductances differ. This holds whether the stroke times are free or forced to be equal; only the power changes.
-- **Remarks on a quantum-dot heat engine.** These follow Lee, Um, and Park, *Phys. Rev. E* **98**, 052137 (2018). A live numerical plot of efficiency at maximum power shows the ½-universality and its breakdown when the gate voltage is tuned at fixed bias.
+- **Unequal conductances.** A widget shows that the efficiency at maximum power stays $`1 - \sqrt{T_c/T_h}`$ when the conductances differ. This holds whether the stroke times are free or forced to be equal; only the power changes.
+- **Remarks on a quantum-dot heat engine.** These follow Lee, Um, and Park, *Phys. Rev. E* **98**, 052137 (2018). A live numerical plot of efficiency at maximum power shows the $`\tfrac{1}{2}`$-universality ($`\eta_{\rm op} \approx \eta_C/2`$) and its breakdown when the gate voltage is tuned at fixed bias.
 - **Light/dark mode.** The page follows the system setting by default. A toggle button overrides it, and the choice is remembered in the browser.
 
 ## Usage
@@ -48,7 +49,8 @@ The page, its derivations, and its interactive figures were created by **Claude 
 통계물리 1 강의에서 다룬 카르노 엔진을 넘어, 유한한 시간 동안 일률을 내는 내부가역(endoreversible) 엔진을 다루는 인터랙티브 보충 자료입니다. 한국어 페이지는 `ko.html`입니다. 주요 내용은 다음과 같습니다.
 
 - 작동 온도를 조절하는 데모
-- 최대 일률에서의 효율 1 − √(*T*<sub>c</sub>/*T*<sub>h</sub>) 유도
+- 최대 일률에서의 효율 $`\eta_{\rm CA} = 1 - \sqrt{T_c/T_h}`$ 유도
+- 실제 작동 순환의 P–V 도표
 - 엔트로피 생성과 준정적·단락 두 극한
 - 실제 발전소와의 비교
 - 양자점 열기관 연구(Lee, Um, Park, PRE 2018)에 대한 덧붙임
