@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 <script>
-(function(){try{var t=localStorage.getItem('cnca-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+(function(){try{var t=localStorage.getItem('netsci-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
 <script>
 window.MathJax = {
@@ -55,6 +55,7 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(-
 .lede{font-size:1.2rem;color:var(--muted);max-width:40rem;margin:.2rem 0 1.4rem}
 .topbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem;margin-top:1.2rem}
 .course{font-family:var(--sans);font-size:.92rem;color:var(--muted);margin:0}
+.course a{color:inherit}
 #themeBtn{white-space:nowrap}
 .topbtns{display:flex;gap:.5rem;align-items:center;flex-shrink:0}
 .langlink{font-family:var(--sans);font-size:.88rem;border:1px solid var(--rule);border-radius:999px;padding:.38rem .9rem;color:var(--ink);text-decoration:none;background:var(--bg)}
@@ -124,7 +125,7 @@ footer li{margin:.35rem 0}
 <main>
 
 <header class="topbar">
-  <p class="course">통계물리 1 보충 자료: 카르노 엔진 너머</p>
+  <p class="course"><a href="https://lshlj82.github.io/statphys1-GNU/">통계물리 1</a> 보충 자료: 카르노 엔진 너머</p>
   <div class="topbtns"><a class="langlink" href="index.html" hreflang="en" lang="en">English</a><button id="themeBtn" type="button" aria-label="색상 테마 전환"></button></div>
 </header>
 <h1>Chambadal–Novikov–Curzon–Ahlborn 엔진</h1>
@@ -357,7 +358,7 @@ footer li{margin:.35rem 0}
 </div>
 
 <footer>
-<p>이 페이지는 Claude Opus 5.5(Anthropic)가 통계물리 1 강의의 보충 자료로 제작했습니다. 유도 과정과 인터랙티브 그림은 모델이 생성한 것이므로 아래 참고문헌과 함께 읽기 바랍니다. 소스 코드: GitHub의 <a href="https://github.com/lshlj82/Chambadal-Novikov-Curzon-Ahlborn-engine">Chambadal-Novikov-Curzon-Ahlborn</a>.</p>
+<p>이 페이지는 Claude Opus 5.5(Anthropic)가 통계물리 1 강의의 보충 자료로 제작했습니다. 유도 과정과 인터랙티브 그림은 모델이 생성한 것이므로 아래 참고문헌과 함께 읽기 바랍니다. 소스 코드: GitHub의 <a href="https://github.com/lshlj82/Chambadal-Novikov-Curzon-Ahlborn-engine">Chambadal-Novikov-Curzon-Ahlborn</a>. 이 페이지는 <a href="https://lshlj82.github.io/statphys1-GNU/">통계물리 1 인터랙티브 데모</a> 중 <a href="https://lshlj82.github.io/heat-engine/">열기관</a> 데모의 보충 자료입니다.</p>
 <ol>
   <li>P. Chambadal, <em>Les centrales nucléaires</em> (Armand Colin, Paris, 1957), pp. 41–58.</li>
   <li>I. I. Novikov, “Efficiency of atomic energy installation,” <em>Atomnaya Energiya</em> <strong>3</strong>(11), 409–412 (1957).</li>
@@ -435,7 +436,7 @@ function syncThemeBtn(){
 $('themeBtn').addEventListener('click', ()=>{
   const next = currentTheme() === 'dark' ? 'light' : 'dark';
   root.setAttribute('data-theme', next);
-  try { localStorage.setItem('cnca-theme', next); } catch(e) {}
+  try { localStorage.setItem('netsci-theme', next); } catch(e) {}
   syncThemeBtn();
 });
 if (mq.addEventListener) mq.addEventListener('change', syncThemeBtn);

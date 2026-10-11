@@ -25,6 +25,8 @@ is widely known as the Curzon–Ahlborn efficiency after their 1975 paper in the
 - **Remarks on a quantum-dot heat engine.** These follow Lee, Um, and Park, *Phys. Rev. E* **98**, 052137 (2018). A live numerical plot of efficiency at maximum power shows the $`\tfrac{1}{2}`$-universality ($`\eta_{\rm op} \approx \eta_C/2`$) and its breakdown when the gate voltage is tuned at fixed bias.
 - **Light/dark mode.** The page follows the system setting by default. A toggle button overrides it, and the choice is remembered in the browser.
 
+It is a supplement to the [Heat Engine](https://lshlj82.github.io/heat-engine/) demo, listed as 8+ among the [Statistical Physics 1 interactive demos](https://lshlj82.github.io/statphys1-GNU/). The light/dark choice is shared with the other course demos.
+
 ## Usage
 
 Each language version is a single self-contained file: `index.html` (English) and `ko.html` (Korean). Open either one in any modern browser, or serve them with GitHub Pages:
